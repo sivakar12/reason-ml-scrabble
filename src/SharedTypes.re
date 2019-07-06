@@ -16,3 +16,5 @@ type square =
 type row = list(square);
 
 type board = list(row);
+
+type bag = list(tile);

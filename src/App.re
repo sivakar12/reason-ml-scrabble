@@ -9,12 +9,16 @@ open SharedTypes;
 
 [@react.component]
 let make = () => {
+    
     let a = { letter: 'a', value: 1 };
     let b = { letter: 'b', value: 2 };
     let row1 = [Empty, Empty, Empty];
     let row2 = [Empty, Tile(a), Tile(b)];
     let row3 = [Empty, Empty, Empty];
     let board = [row1, row2, row3];
+
+    let tiles = Rules.make_tile_bag();
+    Js.log(tiles);
 
     <div>
         <h1>{ReasonReact.string("Scrabble")}</h1>
