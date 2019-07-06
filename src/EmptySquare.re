@@ -2,7 +2,6 @@ open SharedTypes;
 
 let multiplier_to_string = (multiplier) => {
     switch (multiplier) {
-        | NoMultiplier => ""
         | DoubleLetter => "DL"
         | TripleLetter => "TL"
         | DoubleWord => "DW"
@@ -11,7 +10,7 @@ let multiplier_to_string = (multiplier) => {
 };
 
 [@react.component]
-let make = (~multiplier: multiplier) => {
+let make = (~multiplier = ?) => {
     let style = ReactDOMRe.Style.make(
         ~height="60px",
         ~width="60px",
@@ -21,5 +20,9 @@ let make = (~multiplier: multiplier) => {
         ~justifyContent="center",
         ()
     );
-    <div style=style>{multiplier |> multiplier_to_string |> ReasonReact.string}</div>
+    let content = switch(multiplier) {
+        | Some(m) => m |> multiplier_to_string |> ReasonReact.string
+        | None => ReasonReact.string("")
+    };
+    <div style=style>{content}</div>
 }

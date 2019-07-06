@@ -9,7 +9,8 @@ let make = (~square: square) => {
     )
     let content = switch(square) {
     | (Some(tile), _) => <Tile tile/>
-    | (None, multiplier) => <Multiplier multiplier/>
+    | (None, Some(multiplier)) => <EmptySquare multiplier/>
+    | (None, None) => <EmptySquare/>
     };
     <div className="board-square" style>
         {content}

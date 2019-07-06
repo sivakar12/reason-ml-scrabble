@@ -41,13 +41,13 @@ let make_tile_bag = () => {
     |> List.flatten;
 }
 
-let get_multiplier = (x: int, y: int) => {
+let get_multiplier = (x: int, y: int): option(multiplier) => {
     switch(x, y) {
-        | (0, 0) => TripleWord
-        | (13, 13) => DoubleWord
-        | (7, 9) => DoubleLetter
-        | (13, 5) => TripleLetter
-        | (_, _) => NoMultiplier
+        | (0, 0) => Some(TripleWord)
+        | (13, 13) => Some(DoubleWord)
+        | (7, 9) => Some(DoubleLetter)
+        | (13, 5) => Some(TripleLetter)
+        | (_, _) => None
     }
 }
 let pick_tile_to_tray = (bag: bag, tray: tray) => {

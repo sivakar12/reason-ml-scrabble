@@ -4,13 +4,12 @@ type tile = {
 };
 
 type multiplier = 
-  | NoMultiplier
   | DoubleLetter
   | TripleLetter
   | DoubleWord
   | TripleWord;
 
-type square = (option(tile), multiplier);
+type square = (option(tile), option(multiplier));
 
 type row = list(square);
 
