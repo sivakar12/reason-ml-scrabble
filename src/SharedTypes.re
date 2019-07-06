@@ -10,11 +10,7 @@ type multiplier =
   | DoubleWord
   | TripleWord;
 
-type placement =
-  | Tile(tile)
-  | Empty;
-
-type square = (placement, multiplier);
+type square = (option(tile), multiplier);
 
 type row = list(square);
 

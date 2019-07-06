@@ -62,6 +62,6 @@ let pick_tile_to_tray = (bag: bag, tray: tray) => {
 let make_board = (): board => 
     Belt.List.makeBy(15, x => 
         Belt.List.makeBy(15, y => 
-            (Empty, get_multiplier(x, y))
+            (None, get_multiplier(x, y))
         )
     );
