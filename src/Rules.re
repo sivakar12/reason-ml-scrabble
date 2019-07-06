@@ -2,6 +2,8 @@ open SharedTypes;
 
 type tileSpec = (char, int, int);
 
+let boardSize = 15
+
 let make_tile_bag = () => {
     let tilesSpecs = [
         ('A', 1, 9),
@@ -34,11 +36,20 @@ let make_tile_bag = () => {
     tilesSpecs 
     |> List.map(spec => {
         let (letter, value, count) = spec;
-        Belt.List.make(count, {letter, value });
+        Belt.List.make(count, {letter, value});
     })
     |> List.flatten;
 }
 
+let get_multiplier = (x: int, y: int) => {
+    switch(x, y) {
+        | (0, 0) => TripleWord
+        | (13, 13) => DoubleWord
+        | (7, 9) => DoubleLetter
+        | (13, 5) => TripleLetter
+        | (_, _) => NoMultiplier
+    }
+}
 let pick_tile_to_tray = (bag: bag, tray: tray) => {
     let bagShuffled = Belt.List.shuffle(bag);
     switch (bagShuffled: bag) {
@@ -46,3 +57,11 @@ let pick_tile_to_tray = (bag: bag, tray: tray) => {
         | [newTile, ...newBag] => (newBag, [newTile, ...tray])
     }
 } 
+
+
+let make_board = (): board => 
+    Belt.List.makeBy(15, x => 
+        Belt.List.makeBy(15, y => 
+            (Empty, get_multiplier(x, y))
+        )
+    );

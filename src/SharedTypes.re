@@ -4,15 +4,17 @@ type tile = {
 };
 
 type multiplier = 
-  | None
+  | NoMultiplier
   | DoubleLetter
   | TripleLetter
   | DoubleWord
   | TripleWord;
 
-type square =
+type placement =
   | Tile(tile)
   | Empty;
+
+type square = (placement, multiplier);
 
 type row = list(square);
 

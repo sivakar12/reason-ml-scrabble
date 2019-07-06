@@ -1,7 +1,7 @@
 open SharedTypes;
 
 [@react.component]
-let make = (~row) => {
+let make = (~row: row) => {
     let style = ReactDOMRe.Style.make(
         ~display="flex",
         ~flexDirection="row",
