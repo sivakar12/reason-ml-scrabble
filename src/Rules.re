@@ -3,8 +3,6 @@ open SharedTypes;
 type tileSpec = (char, int, int);
 
 let make_tile_bag = () => {
-    /* let tuple = ('A', 1, 2);
-    tuple; */
     let tilesSpecs = [
         ('A', 1, 9),
         ('B', 3, 2),
@@ -40,3 +38,11 @@ let make_tile_bag = () => {
     })
     |> List.flatten;
 }
+
+let pick_tile_to_tray = (bag: bag, tray: tray) => {
+    let bagShuffled = Belt.List.shuffle(bag);
+    switch (bagShuffled: bag) {
+        | [] => (bag, tray)
+        | [newTile, ...newBag] => (newBag, [newTile, ...tray])
+    }
+} 

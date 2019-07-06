@@ -2,6 +2,7 @@ type tile = {
     letter: char,
     value: int
 };
+
 type multiplier = 
   | None
   | DoubleLetter
@@ -18,3 +19,5 @@ type row = list(square);
 type board = list(row);
 
 type bag = list(tile);
+
+type tray = list(tile);
