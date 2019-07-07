@@ -4,6 +4,7 @@ type contextType = {
     board: board,
     tray: tray,
     selectTrayTile: int => unit,
+    selectedTrayItem: option(int),
     selectBoardTile: (int, int) => unit,
     fillTray: unit => unit
 };
@@ -15,6 +16,7 @@ let startingContext = {
     board: startingBoard,
     tray: emptyTray,
     selectTrayTile: (_: int) => (),
+    selectedTrayItem: None,
     selectBoardTile: (_: int, _:int) => (),
     fillTray: () => ()
 };
@@ -33,12 +35,20 @@ let make = (~children) => {
     let (board, _) = React.useState(() => startingBoard);
     let (tray, setTray) = React.useState(() => emptyTray);
 
+    let (selectedTrayItem, setSelectedTrayItem) = React.useState((): option(int) => None);
+    // let (selectedBoardSquare, setSelectedBoardSquare) = React.useState((): option((int, int)) => None);
+
     let contextValue = {
         board: board,
         tray: tray,
         selectTrayTile: (i: int) => {
             Js.log("Tray tile clicked: " ++ string_of_int(i));
+            switch(selectedTrayItem) {
+                |Some(_) => setSelectedTrayItem(_ => None)
+                |None => setSelectedTrayItem(_ => Some(i))
+            }
         },
+        selectedTrayItem,
         selectBoardTile: (x: int, y:int) => {
             Js.log("Board square clicked: (" ++ string_of_int(x) ++ ", " ++ string_of_int(y) ++ ")");
         },
