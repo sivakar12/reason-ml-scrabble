@@ -60,6 +60,29 @@ let pick_tile_to_tray = (bag: bag, tray: tray) => {
     }
 } 
 
+let add_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
+    board |> List.mapi((xi, row) => {
+        row |> List.mapi((yi, square) => {
+            (xi == x && yi == y) ?
+                switch(square) {
+                    | (None, multiplier) => (Some(tile), multiplier)
+                    | _ => square
+                }
+                : square
+        })
+    })
+}
+
+let take_tile_from_tray = (tray: tray, index: int): (tray, option(tile)) => {
+    let tileTaken = Belt.List.get(tray, index);
+    switch(tileTaken) {
+        | Some(tileTaken) => {
+            let newTray = Belt.List.keep( tray, tile => tile != tileTaken );
+            (newTray, Some(tileTaken))
+        }
+        | None => (tray, None)
+    }
+}
 
 let make_board = (): board => 
     Belt.List.makeBy(15, x => 

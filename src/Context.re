@@ -32,12 +32,11 @@ module Provider = {
 let make = (~children) => {
     
     let (bag, setBag) = React.useState(() => Rules.make_tile_bag());
-    let (board, _) = React.useState(() => startingBoard);
+    let (board, setBoard) = React.useState(() => startingBoard);
     let (tray, setTray) = React.useState(() => emptyTray);
 
     let (selectedTrayItem, setSelectedTrayItem) = React.useState((): option(int) => None);
     // let (selectedBoardSquare, setSelectedBoardSquare) = React.useState((): option((int, int)) => None);
-
     let contextValue = {
         board: board,
         tray: tray,
@@ -51,6 +50,21 @@ let make = (~children) => {
         selectedTrayItem,
         selectBoardTile: (x: int, y:int) => {
             Js.log("Board square clicked: (" ++ string_of_int(x) ++ ", " ++ string_of_int(y) ++ ")");
+            switch (selectedTrayItem) {
+                | Some(i) => {
+                    let (newTray, takenTile) = Rules.take_tile_from_tray(tray, i);
+                    switch (takenTile) {
+                        |Some(takenTile) => {
+                            let newBoard = Rules.add_tile_to_board(board, takenTile, x, y)
+                            setBoard(_ => newBoard);
+                            setSelectedTrayItem(_ => None);
+                            setTray(_ => newTray);
+                        }
+                        |None => ()
+                    }
+                } 
+                | None => () // When nothing is selected on the tray
+            }
         },
         fillTray: () => {
             let (newBag, newTray) = Rules.pick_tile_to_tray(bag, tray);
@@ -60,7 +74,6 @@ let make = (~children) => {
     };
 
     <Provider value=contextValue>
-        <h1>{"Context" |> ReasonReact.string}</h1>
         {children}
     </Provider>
 };

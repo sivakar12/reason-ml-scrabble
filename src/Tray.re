@@ -24,13 +24,14 @@ let make = () => {
     }
 
     let makeTileOfTray = (index: int, tile: tile) => 
-        <div onClick={_event => context.selectTrayTile(index)} style=makeStyleFromIndex(index)>
-            <Tile
-                key=string_of_int(index) 
-                tile
-            />
+        <div
+            onClick={_event => context.selectTrayTile(index)}
+            style=makeStyleFromIndex(index)
+            key=string_of_int(index)
+        >
+            <Tile tile/>
         </div>;
-        
+
     <div className="tray" style=style>
         {tray
         |> List.mapi(makeTileOfTray)
