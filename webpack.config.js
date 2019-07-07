@@ -9,12 +9,13 @@ module.exports = {
   mode: isProd ? 'production' : 'development',
   output: {
     path: outputDir,
+    publicPath: '/',
     filename: 'Index.js'
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      inject: false
+      // inject: false
     })
   ],
   devServer: {
