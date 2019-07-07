@@ -2,7 +2,7 @@ open SharedTypes;
 
 
 [@react.component]
-let make = (~square: square) => {
+let make = (~square: square, ~x: int, ~y: int) => {
     let style = ReactDOMRe.Style.make(
         ~border="solid black 1px",
         ()
@@ -12,7 +12,10 @@ let make = (~square: square) => {
     | (None, Some(multiplier)) => <EmptySquare multiplier/>
     | (None, None) => <EmptySquare/>
     };
-    <div className="board-square" style>
+    // let handleClick: () =>  {
+    //     Js.log(x, y);
+    // };
+    <div className="board-square" style onClick={_event => Js.log((x, y));}>
         {content}
     </div>
 };
