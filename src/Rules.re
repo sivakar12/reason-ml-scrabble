@@ -41,6 +41,8 @@ let make_tile_bag = () => {
     |> List.flatten;
 }
 
+let emptyTray: tray = []
+
 let get_multiplier = (x: int, y: int): option(multiplier) => {
     switch(x, y) {
         | (0, 0) => Some(TripleWord)
