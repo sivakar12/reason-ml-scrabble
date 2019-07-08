@@ -1,11 +1,13 @@
 open SharedTypes;
 
 [@react.component]
-let make = (~tile) => {
+let make = (~tile, ~committed=true) => {
 
     let tileStyle = ReactDOMRe.Style.make(
-        ~backgroundColor="#fabc74",
-        ~color="#eb5f5d",
+        // ~backgroundColor="#fabc74",
+        ~backgroundColor=committed ? "#fabc74" : "#eb5f5d",
+        // ~color="#eb5f5d",
+        ~color=committed ? "#eb5f5d" : "#fabc74",
         ~height="60px",
         ~width="60px",
         ~display="flex",

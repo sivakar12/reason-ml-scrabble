@@ -9,7 +9,12 @@ type multiplier =
   | DoubleWord
   | TripleWord;
 
-type square = (option(tile), option(multiplier));
+type boardPlacement = 
+| ThisMoveTile(tile)
+| CommittedTile(tile)
+| Empty
+
+type square = (boardPlacement, option(multiplier));
 
 type row = list(square);
 

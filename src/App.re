@@ -4,6 +4,7 @@ let make = () => {
         <Context>
             <Board/>
             <Tray/>
+            <Controls/>
         </Context>
     </div>;
 }

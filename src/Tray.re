@@ -38,6 +38,5 @@ let make = () => {
         |> Array.of_list
         |> ReasonReact.array
         }
-        <button onClick={ _ => context.dispatch(FillTray) }>{"Fill Tray" |> ReasonReact.string}</button>
     </div>
 }
