@@ -49,7 +49,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             }
         }
         | FillTray => {
-            let (newBag, newTray) = Rules.pick_tile_to_tray(state.bag, state.tray);
+            let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
             {
                 ...state,
                 bag: newBag,

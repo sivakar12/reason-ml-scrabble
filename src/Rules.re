@@ -69,11 +69,16 @@ let get_multiplier = (x: int, y: int): option(multiplier) => {
         | _ => None
     }
 }
-let pick_tile_to_tray = (bag: bag, tray: tray) => {
+let rec fill_tray = (bag: bag, tray: tray) => {
     let bagShuffled = Belt.List.shuffle(bag);
-    switch (bagShuffled: bag) {
+    let (newBag, newTray) = switch (bagShuffled: bag) {
         | [] => (bag, tray)
         | [newTile, ...newBag] => (newBag, [newTile, ...tray])
+    };
+    if (List.length(newTray) == 7 || List.length(bag) == 0) {
+        (newBag, newTray)
+    } else {
+        fill_tray(newBag, newTray)
     }
 } 
 
