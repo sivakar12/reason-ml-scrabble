@@ -9,8 +9,8 @@ let style = ReactDOMRe.Style.make(
 [@react.component]
 let make = () => {
     let context = React.useContext(Context.context);
-    let tray: tray  = context.tray;
-    let selected = context.selectedTrayItem;
+    let tray: tray  = context.state.tray;
+    let selected = context.state.selectedTrayItem;
 
     let makeStyleFromIndex = (i: int) => {
         let border = switch(selected) {
@@ -25,7 +25,7 @@ let make = () => {
 
     let makeTileOfTray = (index: int, tile: tile) => 
         <div
-            onClick={_event => context.selectTrayTile(index)}
+            onClick={_event => context.dispatch(ClickTray(index))}
             style=makeStyleFromIndex(index)
             key=string_of_int(index)
         >
@@ -38,6 +38,6 @@ let make = () => {
         |> Array.of_list
         |> ReasonReact.array
         }
-        <button onClick={ _ => context.fillTray() }>{"Fill Tray" |> ReasonReact.string}</button>
+        <button onClick={ _ => context.dispatch(FillTray) }>{"Fill Tray" |> ReasonReact.string}</button>
     </div>
 }

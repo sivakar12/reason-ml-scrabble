@@ -16,7 +16,7 @@ let make = (~square: square, ~x: int, ~y: int) => {
     | (None, None) => <EmptySquare/>
     };
 
-    <div className="board-square" style onClick={_event => context.selectBoardTile(x, y)}>
+    <div className="board-square" style onClick={_event => context.dispatch(ClickBoard(x, y))}>
         {content}
     </div>
 };
