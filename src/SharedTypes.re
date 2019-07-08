@@ -10,9 +10,9 @@ type multiplier =
   | TripleWord;
 
 type boardPlacement = 
-| ThisMoveTile(tile)
-| CommittedTile(tile)
-| Empty
+| NewPlacement(tile)
+| CommittedPlacement(tile)
+| NoPlacement
 
 type square = (boardPlacement, option(multiplier));
 

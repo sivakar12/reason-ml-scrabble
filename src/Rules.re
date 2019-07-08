@@ -87,7 +87,7 @@ let add_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
         row |> List.mapi((yi, square) => {
             (xi == x && yi == y) ?
                 switch(square) {
-                    | (Empty, multiplier) => (ThisMoveTile(tile), multiplier)
+                    | (NoPlacement, multiplier) => (NewPlacement(tile), multiplier)
                     | _ => square
                 }
                 : square
@@ -109,6 +109,6 @@ let take_tile_from_tray = (tray: tray, index: int): (tray, option(tile)) => {
 let make_board = (): board => 
     Belt.List.makeBy(15, x => 
         Belt.List.makeBy(15, y => 
-            (Empty, get_multiplier(x, y))
+            (NoPlacement, get_multiplier(x, y))
         )
     );

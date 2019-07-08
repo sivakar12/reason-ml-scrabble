@@ -63,7 +63,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             let newBoard = state.board |> List.map(row => {
                 row |> List.map(square => {
                     switch(square) {
-                        | (ThisMoveTile(tile), multiplier) => (CommittedTile(tile), multiplier)
+                        | (NewPlacement(tile), multiplier) => (CommittedPlacement(tile), multiplier)
                         | _ => square
                     }
                 })
@@ -74,7 +74,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             let newBoard = state.board |> List.map(row => {
                 row |> List.map(square => {
                     switch(square) {
-                        | (ThisMoveTile(_), multiplier) => (Empty, multiplier)
+                        | (NewPlacement(_), multiplier) => (NoPlacement, multiplier)
                         | _ => square
                     }
                 })

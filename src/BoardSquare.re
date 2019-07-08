@@ -11,10 +11,10 @@ let make = (~square: square, ~x: int, ~y: int) => {
     let context = React.useContext(Context.context);
 
     let content = switch(square) {
-    | (ThisMoveTile(tile), _) => <Tile tile committed=false/>
-    | (CommittedTile(tile), _) => <Tile tile/>
-    | (Empty, Some(multiplier)) => <EmptySquare multiplier/>
-    | (Empty, None) => <EmptySquare/>
+    | (NewPlacement(tile), _) => <Tile tile committed=false/>
+    | (CommittedPlacement(tile), _) => <Tile tile/>
+    | (NoPlacement, Some(multiplier)) => <EmptySquare multiplier/>
+    | (NoPlacement, None) => <EmptySquare/>
     };
 
     <div className="board-square" style onClick={_event => context.dispatch(ClickBoard(x, y))}>
