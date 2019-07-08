@@ -57,6 +57,6 @@ let reducer = (state: reducerState, action: action): reducerState => {
             }
 
         }
-        | _ => state
+        // | _ => state
     }
 }
