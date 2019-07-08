@@ -6,6 +6,7 @@ let multiplier_to_string = (multiplier) => {
         | TripleLetter => "TL"
         | DoubleWord => "DW"
         | TripleWord => "TW"
+        | NoMultiplier => ""
     };
 };
 

@@ -7,14 +7,15 @@ type multiplier =
   | DoubleLetter
   | TripleLetter
   | DoubleWord
-  | TripleWord;
+  | TripleWord
+  | NoMultiplier;
 
 type boardPlacement = 
 | NewPlacement(tile)
 | CommittedPlacement(tile)
 | NoPlacement
 
-type square = (boardPlacement, option(multiplier));
+type square = (boardPlacement, multiplier);
 
 type row = list(square);
 

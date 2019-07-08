@@ -13,8 +13,7 @@ let make = (~square: square, ~x: int, ~y: int) => {
     let content = switch(square) {
     | (NewPlacement(tile), _) => <Tile tile committed=false/>
     | (CommittedPlacement(tile), _) => <Tile tile/>
-    | (NoPlacement, Some(multiplier)) => <EmptySquare multiplier/>
-    | (NoPlacement, None) => <EmptySquare/>
+    | (NoPlacement, multiplier) => <EmptySquare multiplier/>
     };
 
     <div className="board-square" style onClick={_event => context.dispatch(ClickBoard(x, y))}>

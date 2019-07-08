@@ -43,7 +43,7 @@ let make_tile_bag = () => {
 
 let emptyTray: tray = []
 
-let get_multiplier = (x: int, y: int): option(multiplier) => {
+let get_multiplier = (x: int, y: int): multiplier => {
     let codedString = 
         "T..d...T...d..T" ++
         ".D...t...t...D." ++
@@ -62,11 +62,11 @@ let get_multiplier = (x: int, y: int): option(multiplier) => {
         "T..d...T...d..T";
     let letter = String.get(codedString, y * 15 + x);
     switch (letter) {
-        | 'T' => Some(TripleWord)
-        | 't' => Some(TripleLetter)
-        | 'D' => Some(DoubleWord)
-        | 'd' => Some(DoubleLetter)
-        | _ => None
+        | 'T' => TripleWord
+        | 't' => TripleLetter
+        | 'D' => DoubleWord
+        | 'd' => DoubleLetter
+        | _ => NoMultiplier
     }
 }
 let rec fill_tray = (bag: bag, tray: tray) => {
