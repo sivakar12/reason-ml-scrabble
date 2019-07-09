@@ -151,3 +151,22 @@ let placements_valid = (board: board): bool => {
     let all_in_one_row = newPlacements |> List.map(((_, y, _)) => y) |> all_same;
     all_in_one_row || all_in_one_column;
 }
+
+let remove_new_tiles = (board: board, tray: tray) : (board, tray)=> {
+    let newPlacementTiles: tray = get_new_placements_flattened(board) -> Belt.List.keepMap(((_, _, square)) => {
+        switch(square) {
+            | (NewPlacement(tile), _) => Some(tile)
+            | _ => None
+        }
+    });
+    let newTray: tray = List.concat([newPlacementTiles, tray]);
+    let newBoard = board |> List.map(row => {
+        row |> List.map(square => {
+            switch(square) {
+                | (NewPlacement(_), multiplier) => (NoPlacement, multiplier)
+                | _ => square
+            }
+        })
+    });
+    (newBoard, newTray);
+}

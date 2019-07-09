@@ -71,19 +71,12 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 });
                 {...state, board: newBoard}
             } else {
-                state
+                let (newBoard, newTray) = Rules.remove_new_tiles(state.board, state.tray);
+                {...state, board: newBoard, tray: newTray}            }
             }
-        }
         | RejectNewPlacements => {
-            let newBoard = state.board |> List.map(row => {
-                row |> List.map(square => {
-                    switch(square) {
-                        | (NewPlacement(_), multiplier) => (NoPlacement, multiplier)
-                        | _ => square
-                    }
-                })
-            });
-            {...state, board: newBoard}
+            let (newBoard, newTray) = Rules.remove_new_tiles(state.board, state.tray);
+            {...state, board: newBoard, tray: newTray}
         }
         // | _ => state
     }
