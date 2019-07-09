@@ -112,3 +112,41 @@ let make_board = (): board =>
             (NoPlacement, get_multiplier(x, y))
         )
     );
+
+
+let map_board_with_coords = (board: board, f: (int, int, square) => 'a) => {
+    board |> List.mapi((x, row) => {
+        row |> List.mapi((y, square) => {
+            f(x, y, square)
+        })
+    })
+};
+
+let get_new_placements_flattened = (board: board): list((int, int, square)) => {
+
+    let optList = board |> List.mapi((x, row) => {
+        row |> List.mapi((y, square) => {
+            switch(square) {
+                | (NewPlacement(_), _) => Some((x, y, square))
+                | _ => None
+            }
+        })
+    }) |> List.flatten;
+    Belt.List.keepMap(optList, x => x)
+};
+
+let all_same = (l: list('a)): bool => {
+    let head= Belt.List.head(l);
+    switch(head) {
+        | Some(head) => {
+            l |> List.for_all(x => x == head)
+        }
+        | None => true
+    }
+}
+let placements_valid = (board: board): bool => {
+    let newPlacements = get_new_placements_flattened(board);
+    let all_in_one_column = newPlacements |> List.map(((x, _, _)) => x) |> all_same;
+    let all_in_one_row = newPlacements |> List.map(((_, y, _)) => y) |> all_same;
+    all_in_one_row || all_in_one_column;
+}

@@ -60,15 +60,19 @@ let reducer = (state: reducerState, action: action): reducerState => {
 
         }
         | CommitNewPlacements => {
-            let newBoard = state.board |> List.map(row => {
-                row |> List.map(square => {
-                    switch(square) {
-                        | (NewPlacement(tile), multiplier) => (CommittedPlacement(tile), multiplier)
-                        | _ => square
-                    }
-                })
-            });
-            {...state, board: newBoard}
+            if (Rules.placements_valid(state.board)) {
+                let newBoard = state.board |> List.map(row => {
+                    row |> List.map(square => {
+                        switch(square) {
+                            | (NewPlacement(tile), multiplier) => (CommittedPlacement(tile), multiplier)
+                            | _ => square
+                        }
+                    })
+                });
+                {...state, board: newBoard}
+            } else {
+                state
+            }
         }
         | RejectNewPlacements => {
             let newBoard = state.board |> List.map(row => {
