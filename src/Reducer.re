@@ -61,7 +61,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
         }
         | CommitNewPlacements => {
             if (Rules.placements_valid(state.board)) {
-                let newBoard = state.board |> List.map(row => {
+                let board = state.board |> List.map(row => {
                     row |> List.map(square => {
                         switch(square) {
                             | (NewPlacement(tile), multiplier) => (CommittedPlacement(tile), multiplier)
@@ -69,14 +69,15 @@ let reducer = (state: reducerState, action: action): reducerState => {
                         }
                     })
                 });
-                {...state, board: newBoard}
+                let (bag, tray) = Rules.fill_tray(state.bag, state.tray);
+                {...state, board, bag, tray}
             } else {
-                let (newBoard, newTray) = Rules.remove_new_tiles(state.board, state.tray);
-                {...state, board: newBoard, tray: newTray}            }
+                let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
+                {...state, board, tray}            }
             }
         | RejectNewPlacements => {
-            let (newBoard, newTray) = Rules.remove_new_tiles(state.board, state.tray);
-            {...state, board: newBoard, tray: newTray}
+            let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
+            {...state, board, tray}
         }
         // | _ => state
     }
