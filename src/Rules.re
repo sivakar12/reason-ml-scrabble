@@ -70,14 +70,15 @@ let get_multiplier = (x: int, y: int): multiplier => {
     }
 }
 let rec fill_tray = (bag: bag, tray: tray) => {
-    let bagShuffled = Belt.List.shuffle(bag);
-    let (newBag, newTray) = switch (bagShuffled: bag) {
-        | [] => (bag, tray)
-        | [newTile, ...newBag] => (newBag, [newTile, ...tray])
-    };
-    if (List.length(newTray) == 7 || List.length(bag) == 0) {
-        (newBag, newTray)
+    if (List.length(tray) == 7 || List.length(bag) == 0) {
+        (bag, tray)
     } else {
+
+        let bagShuffled = Belt.List.shuffle(bag);
+        let (newBag, newTray) = switch (bagShuffled: bag) {
+            | [] => (bag, tray)
+            | [newTile, ...newBag] => (newBag, [newTile, ...tray])
+        };
         fill_tray(newBag, newTray)
     }
 } 
