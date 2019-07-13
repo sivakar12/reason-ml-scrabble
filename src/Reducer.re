@@ -6,7 +6,8 @@ type reducerState = {
     tray: tray,
     selectedTrayItem: option(int),
     gameState: gameState,
-    gameId: option(gameId)
+    gameId: option(gameId),
+    dataToSend: option(dataToSend)
 }
 
 type action = 
@@ -15,6 +16,7 @@ type action =
 | FillTray
 | CommitNewPlacements
 | RejectNewPlacements
+| RegisterOpponentsMove(newPlacements, bagRemovals)
 | StartGame(gameId, gameState)
 
 let initialState: reducerState = {
@@ -23,7 +25,8 @@ let initialState: reducerState = {
     tray: Rules.emptyTray,
     selectedTrayItem: None,
     gameState: NotStarted,
-    gameId: None
+    gameId: None,
+    dataToSend: None
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
@@ -60,17 +63,28 @@ let reducer = (state: reducerState, action: action): reducerState => {
             }
         }
         | (MyTurn, FillTray) => {
-            let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
+            let numberToTake = Rules.traySize - List.length(state.tray);
+            let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake);
+            // let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
             {
                 ...state,
                 bag: newBag,
-                tray: newTray
+                tray: List.concat([state.tray, takenTiles])
             }
 
         }
         | (MyTurn, CommitNewPlacements) => {
             if (Rules.placements_valid(state.board)) {
-                let board = state.board |> List.map(row => {
+                let newPlacements: newPlacements = (state.board |> List.mapi((x, row) => {
+                    row |> List.mapi((y, square) => {
+                        switch(square) {
+                            | (NewPlacement(tile), _) => Some((tile, x, y))
+                            | _ => None
+                        }
+                    })
+                }) |> List.flatten) -> Belt.List.keepMap(x => x);
+
+                let newBoard = state.board |> List.map(row => {
                     row |> List.map(square => {
                         switch(square) {
                             | (NewPlacement(tile), multiplier) => (CommittedPlacement(tile), multiplier)
@@ -78,16 +92,31 @@ let reducer = (state: reducerState, action: action): reducerState => {
                         }
                     })
                 });
-                let (bag, tray) = Rules.fill_tray(state.bag, state.tray);
-                {...state, board, bag, tray}
+                let numberToTake = Rules.traySize - List.length(state.tray);
+                let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake)
+                let dataToSend = Some((newPlacements, takenTiles));
+                {
+                    ...state, 
+                    board: newBoard, 
+                    bag: newBag, 
+                    tray: List.concat([state.tray, takenTiles]), 
+                    dataToSend
+                }
             } else {
                 let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
-                {...state, board, tray}            }
+                {...state, board, tray}
             }
+        }
         | (MyTurn, RejectNewPlacements) => {
             let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
             {...state, board, tray}
         }
-         | _ => state
+        | (OpponentsTurn, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
+            let board = Belt.List.reduce(tilesPlacedOnBoard, state.board, 
+                (board, (tile, x, y)) => Rules.add_tile_to_board(board, tile, x, y));
+            let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.remove_tile_from_bag(bag, tile));
+            {...state, board, bag, gameState: MyTurn}
+        }
+        | _ => state
     }
 }

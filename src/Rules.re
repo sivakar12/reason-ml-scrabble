@@ -3,7 +3,7 @@ open SharedTypes;
 type tileSpec = (char, int, int);
 
 let boardSize = 15
-
+let traySize = 7
 let make_tile_bag = () => {
     let tilesSpecs = [
         ('A', 1, 9),
@@ -38,7 +38,7 @@ let make_tile_bag = () => {
         let (letter, value, count) = spec;
         Belt.List.make(count, {letter, value});
     })
-    |> List.flatten;
+    |> List.flatten |> Belt.List.shuffle;
 }
 
 let emptyTray: tray = []
@@ -69,19 +69,31 @@ let get_multiplier = (x: int, y: int): multiplier => {
         | _ => NoMultiplier
     }
 }
-let rec fill_tray = (bag: bag, tray: tray) => {
-    if (List.length(tray) == 7 || List.length(bag) == 0) {
-        (bag, tray)
-    } else {
+// let rec fill_tray = (bag: bag, tray: tray) => {
+//     if (List.length(tray) == 7 || List.length(bag) == 0) {
+//         (bag, tray)
+//     } else {
 
-        let bagShuffled = Belt.List.shuffle(bag);
-        let (newBag, newTray) = switch (bagShuffled: bag) {
-            | [] => (bag, tray)
-            | [newTile, ...newBag] => (newBag, [newTile, ...tray])
-        };
-        fill_tray(newBag, newTray)
+//         let bagShuffled = Belt.List.shuffle(bag);
+//         let (newBag, newTray) = switch (bagShuffled: bag) {
+//             | [] => (bag, tray)
+//             | [newTile, ...newBag] => (newBag, [newTile, ...tray])
+//         };
+//         fill_tray(newBag, newTray)
+//     }
+// } 
+
+let rec take_from_bag = (bag: bag, n: int): (bag, list(tile)) => {
+    Js.log("Take from bag");
+    switch ((bag, n)){
+        | (_, 0) => (bag, [])
+        | ([], _) => (bag, [])
+        | ([tile, ...bag], n) => {
+            let (bag, tiles) = take_from_bag(bag, n - 1);
+            (bag, [tile, ...tiles])
+        }
     }
-} 
+}
 
 let add_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
     board |> List.mapi((xi, row) => {
@@ -169,4 +181,13 @@ let remove_new_tiles = (board: board, tray: tray) : (board, tray)=> {
         })
     });
     (newBoard, newTray);
+}
+
+let rec remove_tile_from_bag(bag: bag, tile: tile): bag {
+    switch(bag) {
+        | [first, ...rest]  => {
+            if (first == tile) { rest } else { [first, ...remove_tile_from_bag(rest, tile)]}
+        }
+        | [] => []
+    }
 }

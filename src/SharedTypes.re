@@ -32,3 +32,7 @@ type gameState =
   | GameOver
 
 type gameId = string;
+
+type newPlacements = list((tile, int, int));
+type bagRemovals = list(tile);
+type dataToSend = (newPlacements, bagRemovals);
