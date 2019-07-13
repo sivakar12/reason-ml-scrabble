@@ -30,3 +30,5 @@ type gameState =
   | MyTurn
   | OpponentsTurn
   | GameOver
+
+type gameId = string;

@@ -1,3 +1,5 @@
+open SharedTypes;
+
 let globalStyle = ReactDOMRe.Style.make(
     ~userSelect="none",
     ()
@@ -6,10 +8,15 @@ let globalStyle = ReactDOMRe.Style.make(
 [@react.component]
 let make = () => {
     let context = React.useContext(Context.context);
-    React.useEffect1(() => { context.dispatch(FillTray); None}, [||]);
-    <div style=globalStyle>
-        <Board/>
-        <Tray/>
-        <Controls/>
-    </div>
+    switch (context.state.gameState) {
+        | NotStarted => <NewGame/>
+        | _ => (
+        <div style=globalStyle>
+            <Status/>
+            <Board/>
+            <Tray/>
+            <Controls/>
+        </div>
+        )
+    }
 }

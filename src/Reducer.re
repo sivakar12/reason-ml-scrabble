@@ -5,7 +5,8 @@ type reducerState = {
     board: board,
     tray: tray,
     selectedTrayItem: option(int),
-    gameState: gameState
+    gameState: gameState,
+    gameId: option(gameId)
 }
 
 type action = 
@@ -14,18 +15,23 @@ type action =
 | FillTray
 | CommitNewPlacements
 | RejectNewPlacements
+| StartGame(gameId, gameState)
 
 let initialState: reducerState = {
     bag: Rules.make_tile_bag(),
     board: Rules.make_board(),
     tray: Rules.emptyTray,
     selectedTrayItem: None,
-    gameState: NotStarted
+    gameState: NotStarted,
+    gameId: None
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
 
     switch((state.gameState, action)) {
+        | (NotStarted, StartGame(gameId, gameState)) => {
+            {...state, gameState, gameId: Some(gameId)}
+        }
         | (MyTurn, ClickTray(index)) => {
             let selectedTrayItem = switch(state.selectedTrayItem) {
                 | Some(_) => None
