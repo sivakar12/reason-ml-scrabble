@@ -5,6 +5,7 @@ type reducerState = {
     board: board,
     tray: tray,
     selectedTrayItem: option(int),
+    gameState: gameState
 }
 
 type action = 
@@ -19,18 +20,20 @@ let initialState: reducerState = {
     board: Rules.make_board(),
     tray: Rules.emptyTray,
     selectedTrayItem: None,
+    gameState: NotStarted
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
-    switch(action) {
-        | ClickTray(index) => {
+
+    switch((state.gameState, action)) {
+        | (MyTurn, ClickTray(index)) => {
             let selectedTrayItem = switch(state.selectedTrayItem) {
                 | Some(_) => None
                 | None => Some(index)
             };
             { ...state, selectedTrayItem}
         }
-        | ClickBoard(x, y) => {
+        | (MyTurn, ClickBoard(x, y)) => {
             switch(state.selectedTrayItem) {
                 | Some(selectedTrayItem) => {
                     let (newTray, takenTile) = Rules.take_tile_from_tray(state.tray, selectedTrayItem);
@@ -50,7 +53,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 | None => state
             }
         }
-        | FillTray => {
+        | (MyTurn, FillTray) => {
             let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
             {
                 ...state,
@@ -59,7 +62,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             }
 
         }
-        | CommitNewPlacements => {
+        | (MyTurn, CommitNewPlacements) => {
             if (Rules.placements_valid(state.board)) {
                 let board = state.board |> List.map(row => {
                     row |> List.map(square => {
@@ -75,10 +78,10 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
                 {...state, board, tray}            }
             }
-        | RejectNewPlacements => {
+        | (MyTurn, RejectNewPlacements) => {
             let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
             {...state, board, tray}
         }
-        // | _ => state
+         | _ => state
     }
 }

@@ -24,3 +24,9 @@ type board = list(row);
 type bag = list(tile);
 
 type tray = list(tile);
+
+type gameState =
+  | NotStarted
+  | MyTurn
+  | OpponentsTurn
+  | GameOver
