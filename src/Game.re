@@ -8,6 +8,7 @@ let globalStyle = ReactDOMRe.Style.make(
 [@react.component]
 let make = () => {
     let context = React.useContext(Context.context);
+    Effects.useFirebaseEffects(context);
     switch (context.state.gameState) {
         | NotStarted => <NewGame/>
         | _ => (

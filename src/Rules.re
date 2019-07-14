@@ -69,22 +69,8 @@ let get_multiplier = (x: int, y: int): multiplier => {
         | _ => NoMultiplier
     }
 }
-// let rec fill_tray = (bag: bag, tray: tray) => {
-//     if (List.length(tray) == 7 || List.length(bag) == 0) {
-//         (bag, tray)
-//     } else {
-
-//         let bagShuffled = Belt.List.shuffle(bag);
-//         let (newBag, newTray) = switch (bagShuffled: bag) {
-//             | [] => (bag, tray)
-//             | [newTile, ...newBag] => (newBag, [newTile, ...tray])
-//         };
-//         fill_tray(newBag, newTray)
-//     }
-// } 
 
 let rec take_from_bag = (bag: bag, n: int): (bag, list(tile)) => {
-    Js.log("Take from bag");
     switch ((bag, n)){
         | (_, 0) => (bag, [])
         | ([], _) => (bag, [])
