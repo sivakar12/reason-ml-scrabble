@@ -6,7 +6,7 @@ type reducerState = {
     tray: tray,
     selectedTrayItem: option(int),
     gameState: gameState,
-    gameId: option(gameId),
+    connection: option(connection),
     dataToSend: option(dataToSend)
 }
 
@@ -17,7 +17,9 @@ type action =
 | CommitNewPlacements
 | RejectNewPlacements
 | RegisterOpponentsMove(newPlacements, bagRemovals)
-| StartGame(gameId, gameState)
+| StartGame(gameId)
+| JoinGame(gameId)
+| ChangeGameState(gameState)
 
 let initialState: reducerState = {
     bag: Rules.make_tile_bag(),
@@ -25,24 +27,26 @@ let initialState: reducerState = {
     tray: Rules.emptyTray,
     selectedTrayItem: None,
     gameState: NotStarted,
-    gameId: None,
+    connection: None,
     dataToSend: None
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
-
     switch((state.gameState, action)) {
-        | (NotStarted, StartGame(gameId, gameState)) => {
-            {...state, gameState, gameId: Some(gameId)}
+        | (NotStarted, StartGame(id)) => {
+            {...state, connection: Some((id, "1"))}
         }
-        | (MyTurn, ClickTray(index)) => {
+        | (NotStarted, JoinGame(id)) => {
+            {...state, connection: Some((id, "2"))}
+        }
+        | (Playing, ClickTray(index)) => {
             let selectedTrayItem = switch(state.selectedTrayItem) {
                 | Some(_) => None
                 | None => Some(index)
             };
             { ...state, selectedTrayItem}
         }
-        | (MyTurn, ClickBoard(x, y)) => {
+        | (Playing, ClickBoard(x, y)) => {
             switch(state.selectedTrayItem) {
                 | Some(selectedTrayItem) => {
                     let (newTray, takenTile) = Rules.take_tile_from_tray(state.tray, selectedTrayItem);
@@ -62,7 +66,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 | None => state
             }
         }
-        | (MyTurn, FillTray) => {
+        | (Playing, FillTray) => {
             let numberToTake = Rules.traySize - List.length(state.tray);
             let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake);
             // let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
@@ -73,7 +77,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             }
 
         }
-        | (MyTurn, CommitNewPlacements) => {
+        | (Playing, CommitNewPlacements) => {
             if (Rules.placements_valid(state.board)) {
                 let newPlacements: newPlacements = (state.board |> List.mapi((x, row) => {
                     row |> List.mapi((y, square) => {
@@ -99,7 +103,8 @@ let reducer = (state: reducerState, action: action): reducerState => {
                     ...state, 
                     board: newBoard, 
                     bag: newBag, 
-                    tray: List.concat([state.tray, takenTiles]), 
+                    tray: List.concat([state.tray, takenTiles]),
+                    gameState: Sending, 
                     dataToSend
                 }
             } else {
@@ -107,15 +112,25 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 {...state, board, tray}
             }
         }
-        | (MyTurn, RejectNewPlacements) => {
+        | (Playing, RejectNewPlacements) => {
             let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
             {...state, board, tray}
         }
-        | (OpponentsTurn, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
+        | (Receiving, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
             let board = Belt.List.reduce(tilesPlacedOnBoard, state.board, 
                 (board, (tile, x, y)) => Rules.add_tile_to_board(board, tile, x, y));
             let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.remove_tile_from_bag(bag, tile));
-            {...state, board, bag, gameState: MyTurn}
+            {...state, board, bag, gameState: Playing}
+        }
+        | (_, ChangeGameState(gameState)) => {
+            switch(gameState) {
+                | Receiving => {
+                    ...state,
+                    dataToSend: None,
+                    gameState,
+                }
+                | _ => {...state, gameState }
+            }
         }
         | _ => state
     }

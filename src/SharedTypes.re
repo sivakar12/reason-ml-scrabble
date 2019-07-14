@@ -27,11 +27,14 @@ type tray = list(tile);
 
 type gameState =
   | NotStarted
-  | MyTurn
-  | OpponentsTurn
-  | GameOver
+  | Playing
+  | Sending
+  | Receiving
+  | Finished
 
 type gameId = string;
+type playerId = string;
+type connection = (gameId, playerId);
 
 type newPlacements = list((tile, int, int));
 type bagRemovals = list(tile);

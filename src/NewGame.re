@@ -3,13 +3,16 @@ let make = () => {
     let context = React.useContext(Context.context);
 
     let (id, setId) = React.useState(_ => "");
-    let handleNewGame = _event => context.dispatch(StartGame("####", MyTurn));
+    let handleNewGame = _event => {
+        let gameId = Random.int(10000) |> string_of_int;
+        context.dispatch(StartGame(gameId));
+    };
     let handleInputChange = event => {
         let idInput: string = ReactEvent.Form.target(event)##value;
         setId(_ => idInput);
     }
     let handleJoinGame = _event => {
-        context.dispatch(StartGame(id, OpponentsTurn));
+        context.dispatch(JoinGame(id));
     };
     <div>
         <button 

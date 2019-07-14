@@ -2,13 +2,14 @@
 let make = () => {
     let context = React.useContext(Context.context);
     let status = switch (context.state.gameState) {
-        | MyTurn => "Place your move"
-        | OpponentsTurn => "Waiting for opponent"
+        | Playing => "Place your move"
+        | Sending => "Sending data"
+        | Receiving => "Waiting for opponent"
         | NotStarted => "Start or join a game"
-        | GameOver => "Finished"
+        | Finished => "Finished"
     } |> s => <div>{s |> ReasonReact.string}</div>;
-    let gameId = switch(context.state.gameId) {
-        | Some(id) => id
+    let gameId = switch(context.state.connection) {
+        | Some((gameId, playerId)) => gameId ++ "#" ++ playerId
         | None => ""
     } |> s => <div>{s |> ReasonReact.string}</div>;
     <div>

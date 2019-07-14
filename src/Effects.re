@@ -13,6 +13,14 @@ let useChangeSender = (context: Context.contextType) => {
             | Some(dataToSend) => {
                 Js.log("Sending data");
                 Js.log(dataToSend);
+                let _ = Js.Global.setTimeout(() => {
+                    context.dispatch(ChangeGameState(Receiving));
+                    let _ = Js.Global.setTimeout(() => {
+                        context.dispatch(RegisterOpponentsMove([], []));
+                        ();
+                    }, 2000);
+                    ();
+                }, 2000);
                 None
             }
             | _ => None
@@ -22,18 +30,21 @@ let useChangeSender = (context: Context.contextType) => {
 
 let useGameStarter = (context: Context.contextType) => {
     React.useEffect1(() => {
-        switch(context.state.gameId, context.state.gameState) {
-            | (Some(id), MyTurn) => {
-                Js.log("Creating game in firebase with id " ++ id);
+        switch(context.state.connection, context.state.gameState) {
+            | (Some((gameId, "1")), NotStarted) => {
+                Js.log("Creating game in firebase with id " ++ gameId);
+                context.dispatch(ChangeGameState(Playing))
+
 
             }
-            | (Some(id), OpponentsTurn) => {
-                Js.log("Joining game in firebase with id " ++ id);
+            | (Some((gameId, "2")), NotStarted) => {
+                Js.log("Joining game in firebase with id " ++ gameId);
+                context.dispatch(ChangeGameState(Receiving))
             }
             | _ => ()
         };
         None
-    }, [|context.state.gameId|])
+    }, [|context.state.connection|])
 }
 
 let useFirebaseEffects = (context: Context.contextType) => {
