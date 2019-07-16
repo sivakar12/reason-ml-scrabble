@@ -1,10 +1,15 @@
-let useChangeListener = (_context: Context.contextType) => {
+let useChangeListener = (context: Context.contextType) => {
     React.useEffect1(() => {
-        Js.log("Registering listener for changes");
-        Some(() => {
-            Js.log("Unregistering listener for changes");
-        })
-    }, [||])
+        switch(context.state.connection) {
+            | Some((_gameId, _playerId)) => {
+                Js.log("Registering listener for changes");
+                Some(() => {
+                    Js.log("Unregistering listener for changes");
+                })
+            }
+            | _ => None
+        }
+    }, [|context.state.connection|])
 }
 
 let useChangeSender = (context: Context.contextType) => {
@@ -33,12 +38,13 @@ let useGameStarter = (context: Context.contextType) => {
         switch(context.state.connection, context.state.gameState) {
             | (Some((gameId, "1")), NotStarted) => {
                 Js.log("Creating game in firebase with id " ++ gameId);
+                Firebase.createGame(gameId);
                 context.dispatch(ChangeGameState(Playing))
-
 
             }
             | (Some((gameId, "2")), NotStarted) => {
                 Js.log("Joining game in firebase with id " ++ gameId);
+                Firebase.joinGame(gameId);
                 context.dispatch(ChangeGameState(Receiving))
             }
             | _ => ()
