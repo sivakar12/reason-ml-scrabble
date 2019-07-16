@@ -1,3 +1,10 @@
+
+let useFirebase = () => {
+    React.useEffect1(() => {
+        Firebase.startFirebase();
+        None
+    }, [||])
+}
 let useChangeListener = (context: Context.contextType) => {
     React.useEffect1(() => {
         switch(context.state.connection) {
@@ -54,6 +61,7 @@ let useGameStarter = (context: Context.contextType) => {
 }
 
 let useFirebaseEffects = (context: Context.contextType) => {
+    useFirebase();
     useGameStarter(context);
     useChangeListener(context);
     useChangeSender(context);
