@@ -1,3 +1,4 @@
+open SharedTypes;
 
 type firebaseConfig = {
     .
@@ -28,10 +29,21 @@ let createGame: string => unit = gameId => {
     let reference = getFirebaseReference(database, gameId ++ "/playerOneStatus");
     let _ = setStringValue(reference, "joined");
     ()
-}
+};
 
 let joinGame: string => unit = gameId => {
     let database = getDatabaseReference();
     let reference = getFirebaseReference(database, gameId ++ "/playerTwoStatus");
     let _ = setStringValue(reference, "joined")
+};
+
+let mapConnectionToPath: connection => string = connection => {
+    let (gameId, playerId) = connection;
+    gameId ++ "/" ++ playerId;
+};
+
+let putNewMove: (dataToSend, connection) => Js.Promise.t(unit) = (_dataToSend, connection) => {
+    let database = getDatabaseReference();
+    let reference = getFirebaseReference(database, mapConnectionToPath(connection) ++ "/data");
+    setStringValue(reference, "newMoves")
 }

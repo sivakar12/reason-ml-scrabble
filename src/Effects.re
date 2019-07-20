@@ -25,15 +25,20 @@ let useChangeSender = (context: Context.contextType) => {
             | Some(dataToSend) => {
                 Js.log("Sending data");
                 Js.log(dataToSend);
-                let _ = Js.Global.setTimeout(() => {
+                let putPromise = Firebase.putNewMove(dataToSend, Belt.Option.getExn(context.state.connection));
+                let _ = putPromise |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Receiving));
                     let _ = Js.Global.setTimeout(() => {
                         context.dispatch(RegisterOpponentsMove([], []));
                         ();
                     }, 2000);
-                    ();
-                }, 2000);
-                None
+                    Js.Promise.resolve(())
+                }) |> Js.Promise.catch(err => {
+                    Js.log("Error sending to firebase");
+                    Js.log(err);
+                    Js.Promise.resolve(())
+                });
+                None;
             }
             | _ => None
         }
