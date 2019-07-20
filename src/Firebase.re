@@ -8,6 +8,7 @@ type firebaseConfig = {
 
 type firebaseDatabase;
 type firebaseReference;
+type firebaseSnapshot;
 
 let config =  [%bs.obj {
     "apiKey": " AIzaSyBi-KlDUGdM4SlTFJkKMlLi5qGPBWuABvU ",
@@ -18,6 +19,9 @@ let config =  [%bs.obj {
 [@bs.module "firebase"] external getDatabaseReference: ( unit => firebaseDatabase) = "database";
 [@bs.send] external getFirebaseReference: (firebaseDatabase, string) => firebaseReference = "ref";
 [@bs.send] external setStringValue: (firebaseReference, string) => Js.Promise.t(unit) = "set";
+[@bs.send] external setOnListener: (firebaseReference, string, (firebaseSnapshot => unit)) => unit = "on";
+[@bs.send] external turnOffListener: (firebaseReference) => unit = "off";
+[@bs.send] external getSnapshotValue: (firebaseSnapshot) => string = "val";
 
 let startFirebase = () => {
     Js.log("Starting firebase");
@@ -37,13 +41,37 @@ let joinGame: string => unit = gameId => {
     let _ = setStringValue(reference, "joined")
 };
 
-let mapConnectionToPath: connection => string = connection => {
+let getMyDataPath: connection => string = connection => {
     let (gameId, playerId) = connection;
-    gameId ++ "/" ++ playerId;
-};
+    gameId ++ "/" ++ playerId ++ "/data"
+}
+
+let getOpponentsDataPath: connection => string = connection => {
+    let (gameId, playerId) = connection;
+    let playerId = switch (playerId) {
+        | "1" => "0"
+        | _ => "1"
+    };
+    gameId ++ "/" ++ playerId ++ "/" ++ "data"
+}
 
 let putNewMove: (dataToSend, connection) => Js.Promise.t(unit) = (_dataToSend, connection) => {
     let database = getDatabaseReference();
-    let reference = getFirebaseReference(database, mapConnectionToPath(connection) ++ "/data");
-    setStringValue(reference, "newMoves")
+    let reference = getFirebaseReference(database, getMyDataPath(connection));
+    setStringValue(reference, Js.Date.now() |> Js.Float.toString)
+}
+
+let listenToMove: (connection, dataToSend => unit) => unit = (connection, callback) => {
+    let database = getDatabaseReference();
+    let reference = getFirebaseReference(database, getOpponentsDataPath(connection));
+    setOnListener(reference, "value", (snapshot) => {
+        Js.log(getSnapshotValue(snapshot));
+        callback(([], []))
+    })
+}
+
+let stopListening: (connection) => unit = (connection) => {
+    let database = getDatabaseReference();
+    let reference = getFirebaseReference(database, getOpponentsDataPath(connection) ++ "/data");
+    turnOffListener(reference);
 }

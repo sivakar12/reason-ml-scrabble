@@ -8,10 +8,15 @@ let useFirebase = () => {
 let useChangeListener = (context: Context.contextType) => {
     React.useEffect1(() => {
         switch(context.state.connection) {
-            | Some((_gameId, _playerId)) => {
-                Js.log("Registering listener for changes");
+            | Some((gameId, playerId)) => {
+                Firebase.listenToMove((gameId, playerId), data => {
+                    Js.log(data);
+                    let (newMoves, takenTiles) = data
+                    context.dispatch(RegisterOpponentsMove(newMoves, takenTiles))
+
+                })
                 Some(() => {
-                    Js.log("Unregistering listener for changes");
+                    Firebase.stopListening((gameId, playerId));
                 })
             }
             | _ => None
@@ -23,15 +28,10 @@ let useChangeSender = (context: Context.contextType) => {
     React.useEffect1(() => {
         switch(context.state.dataToSend) {
             | Some(dataToSend) => {
-                Js.log("Sending data");
-                Js.log(dataToSend);
+                context.dispatch(ChangeGameState(Sending));
                 let putPromise = Firebase.putNewMove(dataToSend, Belt.Option.getExn(context.state.connection));
                 let _ = putPromise |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Receiving));
-                    let _ = Js.Global.setTimeout(() => {
-                        context.dispatch(RegisterOpponentsMove([], []));
-                        ();
-                    }, 2000);
                     Js.Promise.resolve(())
                 }) |> Js.Promise.catch(err => {
                     Js.log("Error sending to firebase");
