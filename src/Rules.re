@@ -81,12 +81,26 @@ let rec take_from_bag = (bag: bag, n: int): (bag, list(tile)) => {
     }
 }
 
-let add_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
+let add_new_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
     board |> List.mapi((xi, row) => {
         row |> List.mapi((yi, square) => {
             (xi == x && yi == y) ?
                 switch(square) {
                     | (NoPlacement, multiplier) => (NewPlacement(tile), multiplier)
+                    | _ => square
+                }
+                : square
+        })
+    })
+}
+
+// TODO: refactor this with the above method
+let add_opponent_tile_to_board = (board: board, tile: tile, x: int, y: int, ): board => {
+    board |> List.mapi((xi, row) => {
+        row |> List.mapi((yi, square) => {
+            (xi == x && yi == y) ?
+                switch(square) {
+                    | (NoPlacement, multiplier) => (CommittedPlacement(tile), multiplier)
                     | _ => square
                 }
                 : square

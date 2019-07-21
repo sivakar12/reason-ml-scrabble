@@ -52,7 +52,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                     let (newTray, takenTile) = Rules.take_tile_from_tray(state.tray, selectedTrayItem);
                     switch(takenTile) {
                         | Some(takenTile) => {
-                            let newBoard = Rules.add_tile_to_board(state.board, takenTile, x, y);
+                            let newBoard = Rules.add_new_tile_to_board(state.board, takenTile, x, y);
                             {
                                 ...state,
                                 board: newBoard,
@@ -118,7 +118,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
         }
         | (Receiving, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
             let board = Belt.List.reduce(tilesPlacedOnBoard, state.board, 
-                (board, (tile, x, y)) => Rules.add_tile_to_board(board, tile, x, y));
+                (board, (tile, x, y)) => Rules.add_opponent_tile_to_board(board, tile, x, y));
             let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.remove_tile_from_bag(bag, tile));
             {...state, board, bag, gameState: Playing}
         }

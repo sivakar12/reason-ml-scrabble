@@ -10,10 +10,8 @@ let useChangeListener = (context: Context.contextType) => {
         switch(context.state.connection) {
             | Some((gameId, playerId)) => {
                 Firebase.listenToMove((gameId, playerId), data => {
-                    Js.log(data);
                     let (newMoves, takenTiles) = data
                     context.dispatch(RegisterOpponentsMove(newMoves, takenTiles))
-
                 })
                 Some(() => {
                     Firebase.stopListening((gameId, playerId));
@@ -33,10 +31,6 @@ let useChangeSender = (context: Context.contextType) => {
                 let _ = putPromise |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Receiving));
                     Js.Promise.resolve(())
-                }) |> Js.Promise.catch(err => {
-                    Js.log("Error sending to firebase");
-                    Js.log(err);
-                    Js.Promise.resolve(())
                 });
                 None;
             }
@@ -51,12 +45,14 @@ let useGameStarter = (context: Context.contextType) => {
             | (Some((gameId, "1")), NotStarted) => {
                 Js.log("Creating game in firebase with id " ++ gameId);
                 Firebase.createGame(gameId);
+                // TODO: Get a promise
                 context.dispatch(ChangeGameState(Playing))
 
             }
             | (Some((gameId, "2")), NotStarted) => {
                 Js.log("Joining game in firebase with id " ++ gameId);
                 Firebase.joinGame(gameId);
+                // TODO: Get a promise
                 context.dispatch(ChangeGameState(Receiving))
             }
             | _ => ()
