@@ -67,8 +67,15 @@ let listenToMove: (connection, dataToSend => unit) => unit = (connection, callba
     let database = getDatabaseReference();
     let reference = getFirebaseReference(database, getOpponentsDataPath(connection));
     setOnListener(reference, "value", (snapshot) => {
-        Js.log(getSnapshotValue(snapshot));
-        callback(([], []))
+        let encodedString = getSnapshotValue(snapshot);
+        let parsedJson = encodedString |> Json.parse
+        switch (parsedJson) {
+            | Some(json) => {
+                let data: dataToSend = JsonEncodeDecode.Decode.dataToSendDecoder(json)
+                callback(data)
+            }
+            | None => ()
+        }
     })
 }
 

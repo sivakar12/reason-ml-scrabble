@@ -27,3 +27,22 @@ module Encode = {
         )
     }
 }
+
+module Decode = {
+    let tileDecoder = json => Json.Decode.{
+        letter: json |> field("letter", char),
+        value: json |> field("value", int)
+    }
+
+    let newPlacementsDecoder = json => Json.Decode.(
+        json |> array(tuple3(tileDecoder, int, int)) |> Belt.List.fromArray
+    )
+
+    let bagRemovalsDecoder = json => Json.Decode.(
+        json |> array(tileDecoder) |> Belt.List.fromArray
+    )
+
+    let dataToSendDecoder = json => Json.Decode.(
+        json |> tuple2(newPlacementsDecoder, bagRemovalsDecoder)
+    )
+}
