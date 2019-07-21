@@ -29,18 +29,18 @@ let startFirebase = () => {
     initializeApp(config);
 };
 
-let createGame: string => unit = gameId => {
+let createGame: string => Js.Promise.t(unit) = gameId => {
     let database = getDatabaseReference();
     let gameReference = getFirebaseReference(database, gameId);
     deleteNode(gameReference);
     let reference = getFirebaseReference(database, gameId ++ "/playerOneStatus");
-    let _ = setStringValue(reference, "joined");
+    setStringValue(reference, "joined");
 };
 
-let joinGame: string => unit = gameId => {
+let joinGame: string => Js.Promise.t(unit) = gameId => {
     let database = getDatabaseReference();
     let reference = getFirebaseReference(database, gameId ++ "/playerTwoStatus");
-    let _ = setStringValue(reference, "joined")
+    setStringValue(reference, "joined")
 };
 
 let getMyDataPath: connection => string = connection => {
