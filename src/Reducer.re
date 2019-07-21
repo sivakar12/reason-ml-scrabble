@@ -7,7 +7,7 @@ type reducerState = {
     selectedTrayItem: option(int),
     gameState: gameState,
     connection: option(connection),
-    dataToSend: option(dataToSend)
+    dataToSend: dataToSend
 }
 
 type action = 
@@ -28,7 +28,7 @@ let initialState: reducerState = {
     selectedTrayItem: None,
     gameState: NotStarted,
     connection: None,
-    dataToSend: None
+    dataToSend: ([], [])
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
@@ -66,14 +66,16 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 | None => state
             }
         }
-        | (Playing, FillTray) => {
+        | (Playing | Receiving, FillTray) => {
             let numberToTake = Rules.traySize - List.length(state.tray);
-            let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake);
-            // let (newBag, newTray) = Rules.fill_tray(state.bag, state.tray);
+            let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
+            let (newPlacements, alreadyRemoved) = state.dataToSend;
+            let allBagRemovals: bagRemovals = List.concat([alreadyRemoved, newlyRemoved]);
             {
                 ...state,
                 bag: newBag,
-                tray: List.concat([state.tray, takenTiles])
+                tray: List.concat([state.tray, newlyRemoved]),
+                dataToSend: (newPlacements, allBagRemovals)
             }
 
         }
@@ -98,7 +100,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 });
                 let numberToTake = Rules.traySize - List.length(state.tray);
                 let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake)
-                let dataToSend = Some((newPlacements, takenTiles));
+                let dataToSend = (newPlacements, takenTiles);
                 {
                     ...state, 
                     board: newBoard, 
@@ -116,7 +118,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
             {...state, board, tray}
         }
-        | (Receiving, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
+        | (_, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
             let board = Belt.List.reduce(tilesPlacedOnBoard, state.board, 
                 (board, (tile, x, y)) => Rules.add_opponent_tile_to_board(board, tile, x, y));
             let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.remove_tile_from_bag(bag, tile));
@@ -126,7 +128,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
             switch(gameState) {
                 | Receiving => {
                     ...state,
-                    dataToSend: None,
+                    // dataToSend: ([], []),
                     gameState,
                 }
                 | _ => {...state, gameState }

@@ -24,18 +24,18 @@ let useChangeListener = (context: Context.contextType) => {
 
 let useChangeSender = (context: Context.contextType) => {
     React.useEffect1(() => {
-        switch(context.state.dataToSend) {
-            | Some(dataToSend) => {
+        switch(context.state.connection) {
+            | Some(connection) => {
                 context.dispatch(ChangeGameState(Sending));
-                let putPromise = Firebase.putNewMove(dataToSend, Belt.Option.getExn(context.state.connection));
+                let putPromise = Firebase.putNewMove(context.state.dataToSend, connection);
                 let _ = putPromise |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Receiving));
                     Js.Promise.resolve(())
                 });
-                None;
             }
-            | _ => None
+            | None => ()
         }
+        None;
     }, [|context.state.dataToSend|])
 }
 
@@ -46,6 +46,7 @@ let useGameStarter = (context: Context.contextType) => {
                 Js.log("Creating game in firebase with id " ++ gameId);
                 let _ = Firebase.createGame(gameId) |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Playing));
+                    context.dispatch(FillTray);
                     Js.Promise.resolve(())
                 });
                 ()
@@ -54,6 +55,7 @@ let useGameStarter = (context: Context.contextType) => {
                 Js.log("Joining game in firebase with id " ++ gameId);
                 let _ = Firebase.joinGame(gameId) |> Js.Promise.then_(() => {
                     context.dispatch(ChangeGameState(Receiving));
+                    context.dispatch(FillTray);
                     Js.Promise.resolve(())
                 });
             }
