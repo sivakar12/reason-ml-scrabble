@@ -55,10 +55,12 @@ let getOpponentsDataPath: connection => string = connection => {
     gameId ++ "/" ++ playerId ++ "/" ++ "data"
 }
 
-let putNewMove: (dataToSend, connection) => Js.Promise.t(unit) = (_dataToSend, connection) => {
+let putNewMove: (dataToSend, connection) => Js.Promise.t(unit) = (dataToSend, connection) => {
     let database = getDatabaseReference();
     let reference = getFirebaseReference(database, getMyDataPath(connection));
-    setStringValue(reference, Js.Date.now() |> Js.Float.toString)
+    let encoded = JsonEncodeDecode.Encode.dataToSendEncoder(dataToSend) |> Js.Json.stringify;
+    Js.log(encoded);
+    setStringValue(reference, encoded);
 }
 
 let listenToMove: (connection, dataToSend => unit) => unit = (connection, callback) => {

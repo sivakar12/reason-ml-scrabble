@@ -165,6 +165,11 @@
   resolved "https://registry.yarnpkg.com/@firebase/webchannel-wrapper/-/webchannel-wrapper-0.2.21.tgz#1116075d3d821e058a8c321385552c51fa3a6680"
   integrity sha512-eL4xPPjTBceYKa27tN3SahSD/7k5ioKFGeZZZX67+aLuxxFts2eTCcotRAeKcjGu1xTz7GnWUkMsj4NZZTIGXg==
 
+"@glennsl/bs-json@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@glennsl/bs-json/-/bs-json-4.0.0.tgz#f057d0d1d84d614e27d8bbb67b64e6b6727f24b2"
+  integrity sha512-nunb6+cZcx7pyooh8i4froogXumOOiFb7rF3bz6E9X7b3Dc+3/HGwpnUjxciFN8eQL4QC+MskzG1tG+Ci1aJxA==
+
 "@grpc/proto-loader@^0.5.0":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.5.1.tgz#48492b53cdda353110b51a4b02f465974729c76f"
