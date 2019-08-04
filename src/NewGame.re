@@ -4,6 +4,7 @@ let make = () => {
 
     let (id, setId) = React.useState(_ => "");
     let handleNewGame = _event => {
+        Random.init(int_of_float(Js.Date.now()));
         let gameId = Random.int(10000) |> string_of_int;
         context.dispatch(StartGame(gameId));
     };
