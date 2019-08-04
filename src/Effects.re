@@ -43,19 +43,19 @@ let useGameStarter = (context: Context.contextType) => {
     React.useEffect1(() => {
         switch(context.state.connection, context.state.gameState) {
             | (Some((gameId, "1")), NotStarted) => {
-                Js.log("Creating game in firebase with id " ++ gameId);
+                // Js.log("Creating game in firebase with id " ++ gameId);
                 let _ = Firebase.createGame(gameId) |> Js.Promise.then_(() => {
-                    context.dispatch(ChangeGameState(Playing));
-                    context.dispatch(FillTray);
+                    context.dispatch(TakeFirstTiles);
+                    context.dispatch(ChangeGameState(Receiving));
                     Js.Promise.resolve(())
                 });
                 ()
             }
             | (Some((gameId, "2")), NotStarted) => {
-                Js.log("Joining game in firebase with id " ++ gameId);
+                // Js.log("Joining game in firebase with id " ++ gameId);
                 let _ = Firebase.joinGame(gameId) |> Js.Promise.then_(() => {
-                    context.dispatch(ChangeGameState(Receiving));
-                    context.dispatch(FillTray);
+                    // context.dispatch(ChangeGameState(Receiving));
+                    context.dispatch(TakeFirstTiles);
                     Js.Promise.resolve(())
                 });
             }
@@ -68,6 +68,6 @@ let useGameStarter = (context: Context.contextType) => {
 let useFirebaseEffects = (context: Context.contextType) => {
     useFirebase();
     useGameStarter(context);
-    useChangeListener(context);
     useChangeSender(context);
+    useChangeListener(context);
 }

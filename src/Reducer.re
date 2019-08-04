@@ -13,13 +13,41 @@ type reducerState = {
 type action = 
 | ClickTray(int)
 | ClickBoard(int, int)
-| FillTray
+| TakeFirstTiles
 | CommitNewPlacements
 | RejectNewPlacements
 | RegisterOpponentsMove(newPlacements, bagRemovals)
 | StartGame(gameId)
 | JoinGame(gameId)
 | ChangeGameState(gameState)
+
+
+let gameStateToName = (gameState: gameState) => {
+    switch (gameState) {
+        | NotStarted => "NotStarted"
+        | Playing => "Plaing"
+        | Sending => "Sending"
+        | Receiving => "Receiving"
+        | Finished => "Finished"
+    }
+}
+let actionToName = (action: action) => {
+    switch (action) {
+        | ClickTray(_) => "ClickTray"
+        | ClickBoard(_, _) => "ClickBoard"
+        | TakeFirstTiles => "TakeFirstTiles"
+        | CommitNewPlacements => "CommitNewPlacements"
+        | RejectNewPlacements => "RejectNewPlacements"
+        | RegisterOpponentsMove(_, _) => "RegisterOpponentsMove"
+        | StartGame(_) => "StartGame"
+        | JoinGame(_) => "JoinGame"
+        | ChangeGameState(state) => {
+            let state = gameStateToName(state);
+            {j|ChangeGameState($state)|j}
+        } 
+        // | _ => "Unkownd Action"
+    }
+}
 
 let initialState: reducerState = {
     bag: Rules.make_tile_bag(),
@@ -32,6 +60,7 @@ let initialState: reducerState = {
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
+    Js.log(actionToName(action));
     switch((state.gameState, action)) {
         | (NotStarted, StartGame(id)) => {
             {...state, connection: Some((id, "1"))}
@@ -66,7 +95,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 | None => state
             }
         }
-        | (Playing | Receiving, FillTray) => {
+        | (NotStarted, TakeFirstTiles) => {
             let numberToTake = Rules.traySize - List.length(state.tray);
             let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
             let (newPlacements, alreadyRemoved) = state.dataToSend;
@@ -77,8 +106,32 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 tray: List.concat([state.tray, newlyRemoved]),
                 dataToSend: (newPlacements, allBagRemovals)
             }
-
         }
+        | (Playing, TakeFirstTiles) => {
+            let numberToTake = Rules.traySize - List.length(state.tray);
+            let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
+            let (newPlacements, alreadyRemoved) = state.dataToSend;
+            let allBagRemovals: bagRemovals = List.concat([alreadyRemoved, newlyRemoved]);
+            {
+                ...state,
+                bag: newBag,
+                tray: List.concat([state.tray, newlyRemoved]),
+                dataToSend: (newPlacements, allBagRemovals)
+            }
+        }
+        // | (Playing | Receiving, FillTray) => {
+        //     let numberToTake = Rules.traySize - List.length(state.tray);
+        //     let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
+        //     let (newPlacements, alreadyRemoved) = state.dataToSend;
+        //     let allBagRemovals: bagRemovals = List.concat([alreadyRemoved, newlyRemoved]);
+        //     {
+        //         ...state,
+        //         bag: newBag,
+        //         tray: List.concat([state.tray, newlyRemoved]),
+        //         dataToSend: (newPlacements, allBagRemovals)
+        //     }
+
+        // }
         | (Playing, CommitNewPlacements) => {
             if (Rules.placements_valid(state.board)) {
                 let newPlacements: newPlacements = (state.board |> List.mapi((x, row) => {
