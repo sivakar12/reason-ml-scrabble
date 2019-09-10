@@ -157,11 +157,27 @@ let all_same = (l: list('a)): bool => {
         | None => true
     }
 }
+
+let all_in_one_column = (board: board): bool => {
+    get_new_placements_flattened(board) |> List.map(((x, _, _)) => x) |> all_same
+}
+
+let all_in_one_row = (board: board): bool => {
+    get_new_placements_flattened(board) |> List.map(((_, y, _)) => y) |> all_same
+}
+
 let placements_valid = (board: board): bool => {
+    // let newPlacements = get_new_placements_flattened(board);
+    all_in_one_row(board) || all_in_one_column(board);
+}
+
+let get_row_or_column_with_new_placements = (board: board): (int, int) => {
     let newPlacements = get_new_placements_flattened(board);
-    let all_in_one_column = newPlacements |> List.map(((x, _, _)) => x) |> all_same;
-    let all_in_one_row = newPlacements |> List.map(((_, y, _)) => y) |> all_same;
-    all_in_one_row || all_in_one_column;
+    switch(all_in_one_column(board), all_in_one_row(board)) {
+        | (true, false) => newPlacements |> List.map(((x, _, _)) => x) |> List.hd |> x => (x, -1)
+        | (false, true) => newPlacements |> List.map(((_, y, _)) => y) |> List.hd |> y => (-1, y)
+        | _ => (-1, -1)
+    }
 }
 
 let remove_new_tiles = (board: board, tray: tray) : (board, tray)=> {
