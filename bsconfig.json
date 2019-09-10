@@ -4,10 +4,16 @@
   "reason": {
     "react-jsx": 3
   },
-  "sources": {
-    "dir" : "src",
-    "subdirs" : true
-  },
+  "sources": [
+    {
+      "dir" : "src",
+      "subdirs" : true
+    },
+    {
+      "dir": "__tests__",
+      "type": "dev"
+    }
+  ],
   "package-specs": [{
     "module": "commonjs",
     "in-source": false
@@ -17,6 +23,9 @@
   "bs-dependencies": [
     "reason-react",
     "@glennsl/bs-json"
+  ],
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest"
   ],
   "refmt": 3
 }
