@@ -70,6 +70,8 @@ let get_multiplier = (x: int, y: int): multiplier => {
     }
 }
 
+// let apply_multilier = (multipliers: list(multiplier), tiles: list(tile)): int => {
+// }
 let rec take_from_bag = (bag: bag, n: int): (bag, list(tile)) => {
     switch ((bag, n)){
         | (_, 0) => (bag, [])
@@ -176,8 +178,95 @@ let get_row_or_column_with_new_placements = (board: board): (int, int) => {
     switch(all_in_one_column(board), all_in_one_row(board)) {
         | (true, false) => newPlacements |> List.map(((x, _, _)) => x) |> List.hd |> x => (x, -1)
         | (false, true) => newPlacements |> List.map(((_, y, _)) => y) |> List.hd |> y => (-1, y)
+        | (true, true) => newPlacements |> List.hd |> ((x, y, _)) => (x, y)
         | _ => (-1, -1)
     }
+}
+
+let get_items_in_row = (board: board, row: int): list(square) => {
+    map_board_with_coords(board, (x, _, square) => {
+        if (x == row) {
+            Some(square)
+        } else {
+            None
+        }
+    }) -> List.flatten -> Belt.List.keepMap(x => x)
+}
+
+let get_items_in_column = (board: board, column: int): list(square) => {
+    map_board_with_coords(board, (_, y, square) => {
+        if (y == column) {
+            Some(square)
+        } else {
+            None
+        }
+    }) -> List.flatten -> Belt.List.keepMap(x => x)
+}
+
+let char_of_square = (square: square): char => {
+    let placement = fst(square);
+    switch(placement) {
+        | NewPlacement(tile) => tile.letter
+        | CommittedPlacement(tile) => tile.letter
+        | _ => 'x'
+    }
+}
+
+
+
+let is_new_placement = (square: square): bool => {
+    switch (square) {
+        | (NewPlacement(_), _) => true
+        | _ => false
+    }
+}
+
+let is_tile = (square: square): bool => {
+    switch(square) {
+        | (NewPlacement(_), _) | (CommittedPlacement(_), _) => true
+        | _ => false
+    }
+}
+
+let get_words_in_row_or_column = (line: list(square)): list(list(square)) => {
+    line |> Utils.split_by(t => !is_tile(t))
+}
+
+let word_contains_new_tile = (word: list(square)): bool => {
+    Utils.any(is_new_placement, word)
+}
+
+let find_the_word = (line: list(square)): list(square) => {
+    let words = get_words_in_row_or_column(line);
+    let theWord = words |> List.find(word_contains_new_tile);
+    theWord
+}
+
+let get_squares_in_row_or_col = (board: board, (row: int, col: int)) : list(square) => {
+    switch((row, col)) {
+        | (-1, y) => get_items_in_column(board, y)
+        | (x, -1) => get_items_in_row(board, x)
+        | (x, y) => {
+            let horizontal = get_items_in_column(board, y) |> find_the_word
+            // Js.log(horizontal |> List.map(char_of_square) |> Utils.string_from_char_list)
+            let vertical = get_items_in_row(board, x) |> find_the_word
+            // Js.log(vertical |> List.map(char_of_square) |> Utils.string_from_char_list)
+
+            if (List.length(horizontal) > List.length(vertical)) {
+                horizontal
+            } else {
+                vertical
+            }
+        }
+    }
+}
+
+let get_score = (board: board): int => {
+    let (row, col) = get_row_or_column_with_new_placements(board);
+    let line = get_squares_in_row_or_col(board, (row, col));
+    let theWord =  find_the_word(line)
+    Js.log(theWord |> List.map(char_of_square) |> Utils.string_from_char_list);
+    0
 }
 
 let remove_new_tiles = (board: board, tray: tray) : (board, tray)=> {

@@ -7,7 +7,8 @@ type reducerState = {
     selectedTrayItem: option(int),
     gameState: gameState,
     connection: option(connection),
-    dataToSend: dataToSend
+    dataToSend: dataToSend,
+    score: int
 }
 
 type action = 
@@ -56,7 +57,8 @@ let initialState: reducerState = {
     selectedTrayItem: None,
     gameState: NotStarted,
     connection: None,
-    dataToSend: ([], [])
+    dataToSend: ([], []),
+    score: 0
 }
 
 let reducer = (state: reducerState, action: action): reducerState => {
@@ -154,13 +156,15 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 let numberToTake = Rules.traySize - List.length(state.tray);
                 let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake)
                 let dataToSend = (newPlacements, takenTiles);
+                let score = Rules.get_score(state.board);
                 {
                     ...state, 
                     board: newBoard, 
                     bag: newBag, 
                     tray: List.concat([state.tray, takenTiles]),
                     gameState: Sending, 
-                    dataToSend
+                    dataToSend,
+                    score
                 }
             } else {
                 let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
