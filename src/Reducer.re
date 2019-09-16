@@ -135,7 +135,8 @@ let reducer = (state: reducerState, action: action): reducerState => {
 
         // }
         | (Playing, CommitNewPlacements) => {
-            if (Rules.Validations.placements_valid(state.board)) {
+            let score = Rules.validate_and_get_score(state.board)
+            if (Belt.Option.isSome(score)) {
                 let newPlacements: newPlacements = (state.board |> List.mapi((x, row) => {
                     row |> List.mapi((y, square) => {
                         switch(square) {
@@ -156,7 +157,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
                 let numberToTake = Rules.traySize - List.length(state.tray);
                 let (newBag, takenTiles) = Rules.Placement.take_from_bag(state.bag, numberToTake)
                 let dataToSend = (newPlacements, takenTiles);
-                let score = Rules.Scoring.get_score(state.board);
+                let score = state.score + Belt.Option.getExn(score);
                 {
                     ...state, 
                     board: newBoard, 

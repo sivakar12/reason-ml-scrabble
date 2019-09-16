@@ -277,10 +277,45 @@ module Validations {
 
 
 module Scoring {
-    let get_score = (board: board): int => {
-        let wordsToScore = WordFinding.get_words_to_score(board);
-        0
+    let apply_letter_multiplier = (square: square): int => {
+        let (placement, multiplier) = square;
+        let multiplierValue = switch(multiplier) {
+            | DoubleLetter => 2
+            | TripleLetter => 3
+            | _ => 1
+        };
+        let tileValue = switch(placement) {
+            | NewPlacement(tile) | CommittedPlacement(tile) => tile.value
+            | _ => 0
+        };
+        multiplierValue * tileValue
+    }
+
+    let apply_word_multipliers = (word: list(square)): int => {
+        let multiplierValue = multiplier => switch(multiplier) {
+            | DoubleWord => 2
+            | TripleWord => 3
+            | _ => 1
+        };
+        let multipliers = word |> List.map(snd);
+        let multipliersProduct = multipliers |> List.map(multiplierValue) |> List.fold_left((a, i) => a * i, 1);
+        let scoreFromLetterMultipliers = word |> List.map(apply_letter_multiplier) |> List.fold_left((a, i) => a + i, 0);
+        let score = scoreFromLetterMultipliers * multipliersProduct;
+        score
+        
+    }
+    let get_score_for_word = (word: list(square)): int => {
+        apply_word_multipliers(word)
     }
 }
 
 
+let validate_and_get_score = (board: board): option(int) => {
+    if (!Validations.placements_valid(board)) {
+        None
+    } else {
+        let words = WordFinding.get_words_to_score(board)
+        let finalScore = words |> List.map(Scoring.get_score_for_word) |> List.fold_left((a, i) => a + i, 0)
+        Some(finalScore)
+    }
+}

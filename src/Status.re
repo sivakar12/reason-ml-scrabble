@@ -15,6 +15,7 @@ let make = () => {
     <div>
         {status}
         {gameId}
+        {"Score:" |> ReasonReact.string} {context.state.score |> string_of_int |> ReasonReact.string}
     </div>
     
 }
