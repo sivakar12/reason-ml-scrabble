@@ -151,7 +151,7 @@ let get_new_placements_flattened = (board: board): list((int, int, square)) => {
 };
 
 let all_same = (l: list('a)): bool => {
-    let head= Belt.List.head(l);
+    let head = Belt.List.head(l);
     switch(head) {
         | Some(head) => {
             l |> List.for_all(x => x == head)
@@ -173,17 +173,16 @@ let placements_valid = (board: board): bool => {
     all_in_one_row(board) || all_in_one_column(board);
 }
 
-let get_row_or_column_with_new_placements = (board: board): (int, int) => {
+let get_row_or_column_with_new_placements = (board: board): (list(int), list(int)) => {
     let newPlacements = get_new_placements_flattened(board);
-    switch(all_in_one_column(board), all_in_one_row(board)) {
-        | (true, false) => newPlacements |> List.map(((x, _, _)) => x) |> List.hd |> x => (x, -1)
-        | (false, true) => newPlacements |> List.map(((_, y, _)) => y) |> List.hd |> y => (-1, y)
-        | (true, true) => newPlacements |> List.hd |> ((x, y, _)) => (x, y)
-        | _ => (-1, -1)
-    }
+    
+    let rows = newPlacements |> List.map(((x, _, _)) => x) |>  Array.of_list |>  Belt.Set.Int.fromArray |> Belt.Set.Int.toList;
+    let columns = newPlacements |> List.map(((_, y, _)) => y) |> Array.of_list |> Belt.Set.Int.fromArray |> Belt.Set.Int.toList;
+
+    (rows, columns)
 }
 
-let get_items_in_row = (board: board, row: int): list(square) => {
+let get_squares_in_row = (board: board, row: int): list(square) => {
     map_board_with_coords(board, (x, _, square) => {
         if (x == row) {
             Some(square)
@@ -193,7 +192,7 @@ let get_items_in_row = (board: board, row: int): list(square) => {
     }) -> List.flatten -> Belt.List.keepMap(x => x)
 }
 
-let get_items_in_column = (board: board, column: int): list(square) => {
+let get_squares_in_column = (board: board, column: int): list(square) => {
     map_board_with_coords(board, (_, y, square) => {
         if (y == column) {
             Some(square)
@@ -212,8 +211,6 @@ let char_of_square = (square: square): char => {
     }
 }
 
-
-
 let is_new_placement = (square: square): bool => {
     switch (square) {
         | (NewPlacement(_), _) => true
@@ -228,7 +225,7 @@ let is_tile = (square: square): bool => {
     }
 }
 
-let get_words_in_row_or_column = (line: list(square)): list(list(square)) => {
+let get_words_from_square_list = (line: list(square)): list(list(square)) => {
     line |> Utils.split_by(t => !is_tile(t))
 }
 
@@ -236,36 +233,20 @@ let word_contains_new_tile = (word: list(square)): bool => {
     Utils.any(is_new_placement, word)
 }
 
-let find_the_word = (line: list(square)): list(square) => {
-    let words = get_words_in_row_or_column(line);
-    let theWord = words |> List.find(word_contains_new_tile);
-    theWord
+let word_to_be_considered = (word: list(square)): bool => {
+    Utils.any(is_new_placement, word) && List.length(word) > 1
 }
-
-let get_squares_in_row_or_col = (board: board, (row: int, col: int)) : list(square) => {
-    switch((row, col)) {
-        | (-1, y) => get_items_in_column(board, y)
-        | (x, -1) => get_items_in_row(board, x)
-        | (x, y) => {
-            let horizontal = get_items_in_column(board, y) |> find_the_word
-            // Js.log(horizontal |> List.map(char_of_square) |> Utils.string_from_char_list)
-            let vertical = get_items_in_row(board, x) |> find_the_word
-            // Js.log(vertical |> List.map(char_of_square) |> Utils.string_from_char_list)
-
-            if (List.length(horizontal) > List.length(vertical)) {
-                horizontal
-            } else {
-                vertical
-            }
-        }
-    }
-}
-
 let get_score = (board: board): int => {
-    let (row, col) = get_row_or_column_with_new_placements(board);
-    let line = get_squares_in_row_or_col(board, (row, col));
-    let theWord =  find_the_word(line)
-    Js.log(theWord |> List.map(char_of_square) |> Utils.string_from_char_list);
+    let (rows, cols) = get_row_or_column_with_new_placements(board);
+    let rowSquaresList = rows |> List.map(get_squares_in_row(board));
+    let columnSquaresList = cols |> List.map(get_squares_in_column(board));
+    let listOfSquares = List.concat([rowSquaresList, columnSquaresList]);
+
+    let wordsToScore = listOfSquares |> List.map(get_words_from_square_list) |> List.flatten |>
+        List.filter(word_to_be_considered);
+    let _ = wordsToScore |> List.map(word => {
+        Js.log(word |> List.map(char_of_square) |> Utils.string_from_char_list)
+    });
     0
 }
 
