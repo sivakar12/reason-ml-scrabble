@@ -51,9 +51,9 @@ let actionToName = (action: action) => {
 }
 
 let initialState: reducerState = {
-    bag: Rules.make_tile_bag(),
-    board: Rules.make_board(),
-    tray: Rules.emptyTray,
+    bag: Rules.Initialization.make_tile_bag(),
+    board: Rules.Initialization.make_board(),
+    tray: Rules.Initialization.emptyTray,
     selectedTrayItem: None,
     gameState: NotStarted,
     connection: None,
@@ -80,10 +80,10 @@ let reducer = (state: reducerState, action: action): reducerState => {
         | (Playing, ClickBoard(x, y)) => {
             switch(state.selectedTrayItem) {
                 | Some(selectedTrayItem) => {
-                    let (newTray, takenTile) = Rules.take_tile_from_tray(state.tray, selectedTrayItem);
+                    let (newTray, takenTile) = Rules.Placement.take_tile_from_tray(state.tray, selectedTrayItem);
                     switch(takenTile) {
                         | Some(takenTile) => {
-                            let newBoard = Rules.add_new_tile_to_board(state.board, takenTile, x, y);
+                            let newBoard = Rules.Placement.add_new_tile_to_board(state.board, takenTile, x, y);
                             {
                                 ...state,
                                 board: newBoard,
@@ -99,7 +99,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
         }
         | (NotStarted, TakeFirstTiles) => {
             let numberToTake = Rules.traySize - List.length(state.tray);
-            let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
+            let (newBag, newlyRemoved) = Rules.Placement.take_from_bag(state.bag, numberToTake);
             let (newPlacements, alreadyRemoved) = state.dataToSend;
             let allBagRemovals: bagRemovals = List.concat([alreadyRemoved, newlyRemoved]);
             {
@@ -111,7 +111,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
         }
         | (Playing, TakeFirstTiles) => {
             let numberToTake = Rules.traySize - List.length(state.tray);
-            let (newBag, newlyRemoved) = Rules.take_from_bag(state.bag, numberToTake);
+            let (newBag, newlyRemoved) = Rules.Placement.take_from_bag(state.bag, numberToTake);
             let (newPlacements, alreadyRemoved) = state.dataToSend;
             let allBagRemovals: bagRemovals = List.concat([alreadyRemoved, newlyRemoved]);
             {
@@ -135,7 +135,7 @@ let reducer = (state: reducerState, action: action): reducerState => {
 
         // }
         | (Playing, CommitNewPlacements) => {
-            if (Rules.placements_valid(state.board)) {
+            if (Rules.Validations.placements_valid(state.board)) {
                 let newPlacements: newPlacements = (state.board |> List.mapi((x, row) => {
                     row |> List.mapi((y, square) => {
                         switch(square) {
@@ -154,9 +154,9 @@ let reducer = (state: reducerState, action: action): reducerState => {
                     })
                 });
                 let numberToTake = Rules.traySize - List.length(state.tray);
-                let (newBag, takenTiles) = Rules.take_from_bag(state.bag, numberToTake)
+                let (newBag, takenTiles) = Rules.Placement.take_from_bag(state.bag, numberToTake)
                 let dataToSend = (newPlacements, takenTiles);
-                let score = Rules.get_score(state.board);
+                let score = Rules.Scoring.get_score(state.board);
                 {
                     ...state, 
                     board: newBoard, 
@@ -167,18 +167,18 @@ let reducer = (state: reducerState, action: action): reducerState => {
                     score
                 }
             } else {
-                let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
+                let (board, tray) = Rules.Placement.remove_new_tiles(state.board, state.tray);
                 {...state, board, tray}
             }
         }
         | (Playing, RejectNewPlacements) => {
-            let (board, tray) = Rules.remove_new_tiles(state.board, state.tray);
+            let (board, tray) = Rules.Placement.remove_new_tiles(state.board, state.tray);
             {...state, board, tray}
         }
         | (_, RegisterOpponentsMove(tilesPlacedOnBoard, tilesTakenFromBag)) => {
             let board = Belt.List.reduce(tilesPlacedOnBoard, state.board, 
-                (board, (tile, x, y)) => Rules.add_opponent_tile_to_board(board, tile, x, y));
-            let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.remove_tile_from_bag(bag, tile));
+                (board, (tile, x, y)) => Rules.Placement.add_opponent_tile_to_board(board, tile, x, y));
+            let bag = Belt.List.reduce(tilesTakenFromBag, state.bag, (bag, tile) => Rules.Placement.remove_tile_from_bag(bag, tile));
             {...state, board, bag, gameState: Playing}
         }
         | (_, ChangeGameState(gameState)) => {
