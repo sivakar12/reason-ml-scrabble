@@ -70,8 +70,6 @@ let get_multiplier = (x: int, y: int): multiplier => {
     }
 }
 
-// let apply_multilier = (multipliers: list(multiplier), tiles: list(tile)): int => {
-// }
 let rec take_from_bag = (bag: bag, n: int): (bag, list(tile)) => {
     switch ((bag, n)){
         | (_, 0) => (bag, [])
@@ -169,11 +167,10 @@ let all_in_one_row = (board: board): bool => {
 }
 
 let placements_valid = (board: board): bool => {
-    // let newPlacements = get_new_placements_flattened(board);
     all_in_one_row(board) || all_in_one_column(board);
 }
 
-let get_row_or_column_with_new_placements = (board: board): (list(int), list(int)) => {
+let get_rows_and_columns_with_new_placements = (board: board): (list(int), list(int)) => {
     let newPlacements = get_new_placements_flattened(board);
     
     let rows = newPlacements |> List.map(((x, _, _)) => x) |>  Array.of_list |>  Belt.Set.Int.fromArray |> Belt.Set.Int.toList;
@@ -183,23 +180,11 @@ let get_row_or_column_with_new_placements = (board: board): (list(int), list(int
 }
 
 let get_squares_in_row = (board: board, row: int): list(square) => {
-    map_board_with_coords(board, (x, _, square) => {
-        if (x == row) {
-            Some(square)
-        } else {
-            None
-        }
-    }) -> List.flatten -> Belt.List.keepMap(x => x)
+    List.nth(board, row)
 }
 
 let get_squares_in_column = (board: board, column: int): list(square) => {
-    map_board_with_coords(board, (_, y, square) => {
-        if (y == column) {
-            Some(square)
-        } else {
-            None
-        }
-    }) -> List.flatten -> Belt.List.keepMap(x => x)
+    board |> List.map(row => List.nth(row, column))
 }
 
 let char_of_square = (square: square): char => {
@@ -237,7 +222,7 @@ let word_to_be_considered = (word: list(square)): bool => {
     Utils.any(is_new_placement, word) && List.length(word) > 1
 }
 let get_score = (board: board): int => {
-    let (rows, cols) = get_row_or_column_with_new_placements(board);
+    let (rows, cols) = get_rows_and_columns_with_new_placements(board);
     let rowSquaresList = rows |> List.map(get_squares_in_row(board));
     let columnSquaresList = cols |> List.map(get_squares_in_column(board));
     let listOfSquares = List.concat([rowSquaresList, columnSquaresList]);
