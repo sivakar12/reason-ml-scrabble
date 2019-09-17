@@ -1,12 +1,12 @@
 let split = (splitter: 'a, l: list('a)): list(list('a)) => {
     let accumulator: list(list('a)) = [[]];
-    let reducer = (accumulator: list(list('a)), item: 'a): list(list('a)) => {
-        if (item == splitter) {
+    let reducer = (accumulator: list(list('a)), current: 'a): list(list('a)) => {
+        if (current == splitter) {
             [[], ...accumulator]
         } else { 
             switch(List.hd(accumulator), List.tl(accumulator)) {
                 | (head, tail) => {
-                    [[item, ...head], ...tail]
+                    [[current, ...head], ...tail]
                 } 
             }
         }
@@ -16,13 +16,13 @@ let split = (splitter: 'a, l: list('a)): list(list('a)) => {
 
 let split_by = (splitter: 'a => bool, l: list('a)): list(list('a)) => {
     let accumulator: list(list('a)) = [[]];
-    let reducer = (accumulator: list(list('a)), item: 'a): list(list('a)) => {
-        if (splitter(item)) {
+    let reducer = (accumulator: list(list('a)), current: 'a): list(list('a)) => {
+        if (splitter(current)) {
             [[], ...accumulator]
         } else { 
             switch(List.hd(accumulator), List.tl(accumulator)) {
                 | (head, tail) => {
-                    [[item, ...head], ...tail]
+                    [[current, ...head], ...tail]
                 } 
             }
         }
@@ -31,8 +31,8 @@ let split_by = (splitter: 'a => bool, l: list('a)): list(list('a)) => {
 }
 
 let any = (predicate: 'a => bool, l: list('a)): bool => {
-    let reducer = (accumulator: bool, item: 'a) => {
-        if (predicate(item)) {
+    let reducer = (accumulator: bool, current: 'a) => {
+        if (predicate(current)) {
             true
         } else {
             accumulator
