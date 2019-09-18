@@ -25,6 +25,16 @@ let get_new_placements_flattened = (board: board): list((int, int, square)) => {
     Belt.List.keepMap(optList, x => x)
 };
 
+let char_of_square = (square: square): char => {
+    let placement = fst(square);
+
+    switch(placement) {
+        | NewPlacement(tile) => tile.letter
+        | CommittedPlacement(tile) => tile.letter
+        | _ => 'x'
+    }
+}
+
 module Initialization = {
     type tileSpec = (char, int, int);
     let make_tile_bag = () => {
@@ -199,16 +209,6 @@ module WordFinding {
         board |> List.map(row => List.nth(row, column))
     }
 
-    let char_of_square = (square: square): char => {
-        let placement = fst(square);
-
-        switch(placement) {
-            | NewPlacement(tile) => tile.letter
-            | CommittedPlacement(tile) => tile.letter
-            | _ => 'x'
-        }
-    }
-
     let is_new_placement = (square: square): bool => {
         switch (square) {
             | (NewPlacement(_), _) => true
@@ -269,9 +269,20 @@ module Validations {
         get_new_placements_flattened(board) |> List.map(((_, y, _)) => y) |> all_same
     }
 
+    let word_in_dict = (word: list(square)): bool => {
+        open Belt.HashSet.String;
+        let chars = word |> List.map(char_of_square);
+        let string = Utils.string_from_char_list(chars)
+        Words.wordsSet -> has(string)
+    }
+
+    let all_words_in_dict = (board: board): bool => {
+        let words = WordFinding.get_words_to_score(board);
+        List.for_all(word_in_dict, words)
+    }
     // Not complete
     let placements_valid = (board: board): bool => {
-        all_in_one_row(board) || all_in_one_column(board);
+        (all_in_one_row(board) || all_in_one_column(board)) && all_words_in_dict(board);
     }
 }
 
