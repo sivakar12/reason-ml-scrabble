@@ -272,8 +272,11 @@ module Validations {
     let word_in_dict = (word: list(square)): bool => {
         open Belt.HashSet.String;
         let chars = word |> List.map(char_of_square);
-        let string = Utils.string_from_char_list(chars)
-        Words.wordsSet -> has(string)
+        let string = Utils.string_from_char_list(chars);
+        Js.log("Checking if " ++ string ++ " is in dict");
+        let result = Words.wordsSet -> has(string);
+        Js.log(result);
+        result
     }
 
     let all_words_in_dict = (board: board): bool => {
