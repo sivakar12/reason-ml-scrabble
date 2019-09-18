@@ -1,3 +1,52 @@
-body {
-    background-color: burlywood
+.board {
+
+}
+
+.board-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.square {
+    border: solid black 1px;
+}
+
+.empty-square {
+    height: 60px;
+    width: 60px;
+    background-color: #239f95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile {
+    height: 60px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile-committed {
+    background-color: #fabc74;
+    color: #eb5f5d;
+}
+
+.tile-not-committed {
+    background-color: #eb5f5d;
+    color: #fabc74;
+}
+
+.tile-letter {
+    font-size: 30px;
+}
+
+.tile-value {
+    font-size: 10px;
+}
+
+.tray {
+    display: flex;
+    flex-direction: row;
 }

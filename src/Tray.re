@@ -1,11 +1,5 @@
 open SharedTypes;
 
-let style = ReactDOMRe.Style.make(
-    ~display="flex",
-    ~flexDirection="row",
-    ()
-);
-
 [@react.component]
 let make = () => {
     let context = React.useContext(Context.context);
@@ -32,7 +26,7 @@ let make = () => {
             <Tile tile/>
         </div>;
 
-    <div className="tray" style=style>
+    <div className="tray">
         {tray
         |> List.mapi(makeTileOfTray)
         |> Array.of_list

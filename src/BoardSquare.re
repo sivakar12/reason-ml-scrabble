@@ -1,10 +1,5 @@
 open SharedTypes;
 
-let style = ReactDOMRe.Style.make(
-    ~border="solid black 1px",
-    ()
-);
-
 [@react.component]
 let make = (~square: square, ~x: int, ~y: int) => {
 
@@ -16,7 +11,7 @@ let make = (~square: square, ~x: int, ~y: int) => {
     | (NoPlacement, multiplier) => <EmptySquare multiplier/>
     };
 
-    <div className="board-square" style onClick={_event => context.dispatch(ClickBoard(x, y))}>
+    <div className="square" onClick={_event => context.dispatch(ClickBoard(x, y))}>
         {content}
     </div>
 };
