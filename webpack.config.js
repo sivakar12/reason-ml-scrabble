@@ -28,8 +28,12 @@ module.exports = {
     rules: [
       {
         test: /\.txt$/i,
-        use: 'raw-loader'
-      }
+        use: 'raw-loader',
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ]
   }
 };
