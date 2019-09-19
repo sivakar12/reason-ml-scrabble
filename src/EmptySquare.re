@@ -16,5 +16,10 @@ let make = (~multiplier = ?) => {
         | Some(m) => m |> multiplier_to_string |> ReasonReact.string
         | None => ReasonReact.string("")
     };
-    <div className="empty-square">{content}</div>
+    let multiplierCssClass = switch(multiplier) {
+        | Some(m) => " multiplier multiplier-" ++ (m |> multiplier_to_string |> String.lowercase)
+        | None => ""
+    };
+    let classString = "empty-square" ++ multiplierCssClass;
+    <div className=classString>{content}</div>
 }
