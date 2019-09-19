@@ -1,19 +1,41 @@
+html, body {
+    padding: 0;
+    margin: 0;
+}
+.game {
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 0;
+}
 .board {
-
+    height: 100vmin;
+    width: 100vmin;
+    display: flex;
+    flex-direction: column;
+    justify-items: stretch;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .board-row {
     display: flex;
     flex-direction: row;
+    justify-items: stretch;
+    height: 100%;
+    width: 100%;
 }
 
 .square {
+    height: 100%;
+    width: 100%;
     border: solid black 1px;
 }
 
 .empty-square {
-    height: 60px;
-    width: 60px;
+    height: 100%;
+    width: 100%;
     background-color: #239f95;
     display: flex;
     align-items: center;
@@ -21,8 +43,8 @@
 }
 
 .tile {
-    height: 60px;
-    width: 60px;
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,8 +67,19 @@
 .tile-value {
     font-size: 10px;
 }
-
 .tray {
     display: flex;
     flex-direction: row;
+    justify-content: stretch;
+}
+.tray .tile {
+    width: 6vmin;
+    height: 6vmin;
+}
+.side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: left;
+    flex-grow: 1;
 }

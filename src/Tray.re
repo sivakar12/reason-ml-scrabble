@@ -32,7 +32,6 @@ let make = () => {
         |> Array.of_list
         |> ReasonReact.array
         }
-        <br/>
-        <div>{"Selected: " |> ReasonReact.string }{ (selected -> Belt.Option.getWithDefault(-1) |> string_of_int |> ReasonReact.string)}</div>
+        // <div>{"Selected: " |> ReasonReact.string }{ (selected -> Belt.Option.getWithDefault(-1) |> string_of_int |> ReasonReact.string)}</div>
     </div>
 }

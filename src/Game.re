@@ -12,11 +12,13 @@ let make = () => {
     switch (context.state.gameState) {
         | NotStarted => <NewGame/>
         | _ => (
-        <div style=globalStyle>
-            <Status/>
+        <div className="game">
             <Board/>
-            <Tray/>
-            <Controls/>
+            <div className="side">
+                <Status/>
+                <Controls/>
+                <Tray/>
+            </div>
         </div>
         )
     }
