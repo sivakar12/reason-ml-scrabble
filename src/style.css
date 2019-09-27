@@ -61,11 +61,11 @@ html, body {
 }
 
 .tile-letter {
-    font-size: 30px;
+    font-size: 4vmin;
 }
 
 .tile-value {
-    font-size: 10px;
+    font-size: 1.5vmin;
 }
 .tray {
     display: flex;
