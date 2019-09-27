@@ -1,4 +1,5 @@
 open SharedTypes;
+open ReactComponents;
 
 let globalStyle = ReactDOMRe.Style.make(
     ~userSelect="none",

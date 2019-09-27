@@ -1,6 +1,8 @@
 
 
 open BsStorybook.Story;
+open SharedTypes;
+open ReactComponents;
 
 let _module = [%bs.raw "module"];
 
@@ -13,7 +15,7 @@ let containerStyle = ReactDOMRe.Style.make(
 let containerDecorator = story =>
   <div style=containerStyle>{story()}</div>
 
-let tile: SharedTypes.tile = { letter: 'A', value: 2 };
+let tile: tile = { letter: 'A', value: 2 };
 
 storiesOf("Tile", _module)
 |. addDecorator(containerDecorator)
